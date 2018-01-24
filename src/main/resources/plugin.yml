@@ -1,8 +1,0 @@
-name: Clann
-main: lol.clann.Clann
-version: 1.0.0
-description: The Api of Clann's plugins.
-depend: [Vault]
-authors: [Clann]
-
-
