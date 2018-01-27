@@ -24,15 +24,6 @@ public class AFKListener implements Listener {
     public AFKListener(Clann aThis) {
         plugin = aThis;
     }
-//移动事件随机性太大
-//    @AFKAnnotation(event = "pMove", index = -99)
-//    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-//    public void PlayerMoveEvent(PlayerMoveEvent event) {
-//        //移动会产生大量事件,连续的移动只记录一次
-//        if (plugin.afkdata.getLastAction(event.getPlayer().getName()) != AFkData.actions.get("pMove")) {
-//            plugin.afkdata.logAction(event.getPlayer().getName(), "pMove");
-//        }
-//    }
 
     @AFKAnnotation(event = "pInteract")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

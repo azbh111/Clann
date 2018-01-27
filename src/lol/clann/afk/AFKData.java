@@ -28,9 +28,9 @@ public class AFKData {
             if (m.isAnnotationPresent(AFKAnnotation.class)) {
                 AFKAnnotation anno = m.getAnnotation(AFKAnnotation.class);
                 if (anno.index() != 0) {
-                    actions.put(m.getAnnotation(AFKAnnotation.class).event(), anno.index());
+                    actions.put(anno.event(), anno.index());
                 } else {
-                    actions.put(m.getAnnotation(AFKAnnotation.class).event(), index++);
+                    actions.put(anno.event(), index++);
                 }
             }
         }
