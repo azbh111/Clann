@@ -9,6 +9,6 @@ package lol.clann.afk;
  *
  * @author zyp
  */
-public class AFkData {
+public class AFKPlayer {
     
 }
