@@ -37,7 +37,6 @@ public class Clann extends JavaPlugin {
 //    public Clann() {
 //
 //    }
-
     static {
         Properties serverProperties = new Properties();
         try {
