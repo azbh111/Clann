@@ -5,7 +5,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import lol.clann.Utils.ObscureUtil;
-import lol.clann.afk.AFkData;
+import lol.clann.afk.AFkData_;
 import lol.clann.api.*;
 import lol.clann.listener.InventoryClickInterval;
 import lol.clann.afk.AFKListener;
@@ -28,7 +28,7 @@ public class Clann extends JavaPlugin {
     public List<BukkitTask> tasks = new ArrayList<>();
     public pluginDebug debuger;
     public DataIO data;
-    public AFkData afkdata;
+    public AFkData_ afkdata;
     public File modLang_Lang = null;
     public File mcLang_Lang = null;
 
@@ -64,7 +64,7 @@ public class Clann extends JavaPlugin {
                 ReflectApi.init();
                 serverTick = new ServerTick();
                 debuger = new pluginDebug(this);
-                afkdata = new AFkData(plugin);
+                afkdata = new AFkData_(plugin);
                 data = new DataIO(this);
                 registerListener();
                 modLang_Lang = new File(this.getDataFolder(), "modLanguage.lang");
