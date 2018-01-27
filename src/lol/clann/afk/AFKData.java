@@ -24,7 +24,7 @@ public class AFKData {
 
     static {
         byte index = 1;
-        for (Method m : AFKData.class.getDeclaredMethods()) {
+        for (Method m : AFKListener.class.getDeclaredMethods()) {
             if (m.isAnnotationPresent(AFKAnnotation.class)) {
                 AFKAnnotation anno = m.getAnnotation(AFKAnnotation.class);
                 if (anno.index() != 0) {
