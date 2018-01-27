@@ -66,7 +66,7 @@ public class AFKPlayer {
      * @return
      */
     public boolean isAFK() {
-        if (actions.size() < 5) {
+        if (actions.size() < 10) {
             AFK = true;//操作过少,判定为afk
         } else {
             byte[] bs = null;
