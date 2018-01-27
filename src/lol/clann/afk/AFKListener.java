@@ -24,62 +24,62 @@ public class AFKListener implements Listener {
     public AFKListener(Clann aThis) {
         plugin = aThis;
     }
-//移动事件随机性太大
-//    @AFKAnnotation(event = "pMove", index = -99)
-//    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-//    public void PlayerMoveEvent(PlayerMoveEvent event) {
-//        //移动会产生大量事件,连续的移动只记录一次
-//        if (plugin.afkdata.getLastAction(event.getPlayer().getName()) != AFkData.actions.get("pMove")) {
-//            plugin.afkdata.logAction(event.getPlayer().getName(), "pMove");
-//        }
-//    }
+
+    @AFKAnnotation(event = "pMove", index = -99)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void event(PlayerMoveEvent event) {
+        //移动会产生大量事件,连续的移动只记录一次
+        if (plugin.afkdata.getLastAction(event.getPlayer().getName()) != AFkData.actions.get("pMove")) {
+            plugin.afkdata.logAction(event.getPlayer().getName(), "pMove");
+        }
+    }
 
     @AFKAnnotation(event = "pInteract")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void PlayerInteractEvent(PlayerInteractEvent event) {
+    public void event(PlayerInteractEvent event) {
         plugin.afkdata.logAction(event.getPlayer().getName(), "pInteract");
     }
 
     @AFKAnnotation(event = "bBreak")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void BlockBreakEvent(BlockBreakEvent event) {
+    public void event(BlockBreakEvent event) {
         plugin.afkdata.logAction(event.getPlayer().getName(), "bBreak");
     }
 
     @AFKAnnotation(event = "bPlace")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void BlockPlaceEvent(BlockPlaceEvent event) {  //固定上线地点会导致此事件在登陆事件前触发
+    public void event(BlockPlaceEvent event) {  //固定上线地点会导致此事件在登陆事件前触发
         plugin.afkdata.logAction(event.getPlayer().getName(), "bPlace");
 
     }
 
     @AFKAnnotation(event = "pChangeW")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void PlayerChangedWorldEvent(PlayerChangedWorldEvent event) {
+    public void event(PlayerChangedWorldEvent event) {
         plugin.afkdata.logAction(event.getPlayer().getName(), "pChangeW");
     }
 
     @AFKAnnotation(event = "pChat")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void PlayerChatEvent(PlayerChatEvent event) {
+    public void event(PlayerChatEvent event) {
         plugin.afkdata.logAction(event.getPlayer().getName(), "pChat");
     }
 
     @AFKAnnotation(event = "pCommand")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void PlayerCommandPreprocessEvent(PlayerCommandPreprocessEvent event) {
+    public void event(PlayerCommandPreprocessEvent event) {
         plugin.afkdata.logAction(event.getPlayer().getName(), "pCommand");
     }
 
     @AFKAnnotation(event = "pSneak")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void PlayerToggleSneakEvent(PlayerToggleSneakEvent event) {
+    public void event(PlayerToggleSneakEvent event) {
         plugin.afkdata.logAction(event.getPlayer().getName(), "pSneak");
     }
 
     @AFKAnnotation(event = "iClick")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void InventoryClickEvent(InventoryClickEvent event) {
+    public void event(InventoryClickEvent event) {
         HumanEntity he = event.getWhoClicked();
         if (he instanceof Player) {
             plugin.afkdata.logAction(((Player) he).getName(), "iClick");
@@ -88,7 +88,7 @@ public class AFKListener implements Listener {
 
     @AFKAnnotation(event = "iOpen")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void InventoryOpenEvent(InventoryOpenEvent event) {
+    public void event(InventoryOpenEvent event) {
         HumanEntity he = event.getPlayer();
         if (he instanceof Player) {
             plugin.afkdata.logAction(((Player) he).getName(), "iOpen");
@@ -97,21 +97,15 @@ public class AFKListener implements Listener {
 
     @AFKAnnotation(event = "pSprint")//冲刺
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void PlayerToggleSprintEvent(PlayerToggleSprintEvent event) {
+    public void event(PlayerToggleSprintEvent event) {
         plugin.afkdata.logAction(event.getPlayer().getName(), "pSprint");
 
     }
 
     @AFKAnnotation(event = "pDeath")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void PlayerDeathEvent(PlayerDeathEvent event) {
+    public void event(PlayerDeathEvent event) {
         plugin.afkdata.logAction(event.getEntity().getName(), "pDeath");
-    }
-
-    @AFKAnnotation(event = "piHeld")
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void PlayerItemHeldEvent(PlayerItemHeldEvent event) {
-        plugin.afkdata.logAction(event.getPlayer().getName(), "piHeld");
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -123,5 +117,4 @@ public class AFKListener implements Listener {
     public void event(PlayerQuitEvent event) {
         plugin.afkdata.removePlayer(event.getPlayer());
     }
-
 }
