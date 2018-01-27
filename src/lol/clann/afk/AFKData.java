@@ -13,7 +13,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-public class AFkData {
+public class AFKData {
 
     /**
      * actions还可以继续优化,直接使用事件名称的hashCode,从而无需此数组
@@ -22,9 +22,11 @@ public class AFkData {
     public final Map<String, AFKPlayer> data = new HashMap<>();
     Clann plugin;
 
+    
+    
     static {
         byte index = 1;
-        for (Method m : AFkData.class.getDeclaredMethods()) {
+        for (Method m : AFKData.class.getDeclaredMethods()) {
             if (m.isAnnotationPresent(AFKAnnotation.class)) {
                 AFKAnnotation anno = m.getAnnotation(AFKAnnotation.class);
                 if (anno.index() != 0) {
@@ -36,7 +38,7 @@ public class AFkData {
         }
     }
 
-    public AFkData(Clann plugin) {
+    public AFKData(Clann plugin) {
         //初始化事件
         this.plugin = plugin;
         for (Player p : Bukkit.getOnlinePlayers()) {
