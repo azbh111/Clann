@@ -60,6 +60,15 @@ public class WrapClass<T> {
         throw new RuntimeException("No Constructor find:(" + paramsToClassString(params) + ")");
     }
 
+    
+    public void set(Object handle,String name,Object value) throws Exception{
+        Field f = fields.get(name);
+        if (f == null) {
+            throw new RuntimeException("No Field find:" + name);
+        }
+        f.set(handle, value);
+    }
+    
     /**
      * 获取属性
      */

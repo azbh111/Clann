@@ -5,10 +5,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import lol.clann.Utils.ObscureUtil;
-import lol.clann.afk.afkData;
+import lol.clann.afk.AFkData;
 import lol.clann.api.*;
 import lol.clann.listener.InventoryClickInterval;
-import lol.clann.listener.afkListener;
+import lol.clann.afk.AFKListener;
 import lol.clann.manager.ThreadManager;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
@@ -28,7 +28,7 @@ public class Clann extends JavaPlugin {
     public List<BukkitTask> tasks = new ArrayList<>();
     public pluginDebug debuger;
     public DataIO data;
-    public afkData afkdata;
+    public AFkData afkdata;
     public File modLang_Lang = null;
     public File mcLang_Lang = null;
 
@@ -65,7 +65,7 @@ public class Clann extends JavaPlugin {
                 ReflectApi.init();
                 serverTick = new ServerTick();
                 debuger = new pluginDebug(this);
-                afkdata = new afkData(plugin);
+                afkdata = new AFkData(plugin);
                 data = new DataIO(this);
                 registerListener();
                 modLang_Lang = new File(this.getDataFolder(), "modLanguage.lang");
@@ -90,7 +90,7 @@ public class Clann extends JavaPlugin {
     }
 
     public void registerListener() {
-        Bukkit.getPluginManager().registerEvents(new afkListener(this), this);
+        Bukkit.getPluginManager().registerEvents(new AFKListener(this), this);
         Bukkit.getPluginManager().registerEvents(new InventoryClickInterval(), this);
         Bukkit.getPluginManager().registerEvents(new ThreadManager(), this);
     }

@@ -3,119 +3,109 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package lol.clann.listener;
+package lol.clann.afk;
 
 import lol.clann.Clann;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerChatEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerToggleSneakEvent;
-import org.bukkit.event.player.PlayerToggleSprintEvent;
+import org.bukkit.entity.*;
+import org.bukkit.event.*;
+import org.bukkit.event.block.*;
+import org.bukkit.event.entity.*;
+import org.bukkit.event.inventory.*;
+import org.bukkit.event.player.*;
 
 /**
  *
  * @author Administrator
  */
-public class afkListener implements Listener{
-    
+public class AFKListener implements Listener {
+
     Clann plugin;
 
-    public afkListener(Clann aThis) {
+    public AFKListener(Clann aThis) {
         plugin = aThis;
     }
 
+    @AFKAnnotation(event = "pMove", index = -99)
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void event(PlayerMoveEvent event) {
-        //1
-        plugin.afkdata.logActionUnsafe(event.getPlayer().getName(), "PlayerMoveEvent");
+        //移动会产生大量事件,连续的移动只记录一次
+        if (plugin.afkdata.getLastAction(event.getPlayer().getName()) != AFkData.actions.get("pMove")) {
+            plugin.afkdata.logAction(event.getPlayer().getName(), "pMove");
+        }
     }
 
+    @AFKAnnotation(event = "pInteract")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void event(PlayerInteractEvent event) {
-        //2
-        plugin.afkdata.logActionUnsafe(event.getPlayer().getName(), "PlayerInteractEvent");
+        plugin.afkdata.logAction(event.getPlayer().getName(), "pInteract");
     }
 
+    @AFKAnnotation(event = "bBreak")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void event(BlockBreakEvent event) {
-        //3
-        plugin.afkdata.logActionUnsafe(event.getPlayer().getName(), "BlockBreakEvent");
+        plugin.afkdata.logAction(event.getPlayer().getName(), "bBreak");
     }
 
+    @AFKAnnotation(event = "bPlace")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void event(BlockPlaceEvent event) {  //固定上线地点会导致此事件在登陆事件前触发
-        //4
-        plugin.afkdata.logActionUnsafe(event.getPlayer().getName(), "BlockPlaceEvent");
+        plugin.afkdata.logAction(event.getPlayer().getName(), "bPlace");
 
     }
 
+    @AFKAnnotation(event = "pChangeW")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void event(PlayerChangedWorldEvent event) {
-        //5
-        plugin.afkdata.logActionSafe(event.getPlayer().getName(), "PlayerChangedWorldEvent");
+        plugin.afkdata.logAction(event.getPlayer().getName(), "pChangeW");
     }
 
+    @AFKAnnotation(event = "pChat")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void event(PlayerChatEvent event) {
-        //6
-        plugin.afkdata.logActionUnsafe(event.getPlayer().getName(), "PlayerChatEvent");
+        plugin.afkdata.logAction(event.getPlayer().getName(), "pChat");
     }
 
+    @AFKAnnotation(event = "pCommand")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void event(PlayerCommandPreprocessEvent event) {
-        //7
-        plugin.afkdata.logActionUnsafe(event.getPlayer().getName(), "PlayerCommandPreprocessEvent");
+        plugin.afkdata.logAction(event.getPlayer().getName(), "pCommand");
     }
 
+    @AFKAnnotation(event = "pSneak")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void event(PlayerToggleSneakEvent event) {
-        //8
-        plugin.afkdata.logActionUnsafe(event.getPlayer().getName(), "PlayerToggleSneakEvent");
+        plugin.afkdata.logAction(event.getPlayer().getName(), "pSneak");
     }
 
+    @AFKAnnotation(event = "iClick")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void event(InventoryClickEvent event) {
-        //9
         HumanEntity he = event.getWhoClicked();
         if (he instanceof Player) {
-            plugin.afkdata.logActionUnsafe(((Player) he).getName(), "InventoryClickEvent");
+            plugin.afkdata.logAction(((Player) he).getName(), "iClick");
         }
     }
 
+    @AFKAnnotation(event = "iOpen")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void event(InventoryOpenEvent event) {
-        //10
         HumanEntity he = event.getPlayer();
         if (he instanceof Player) {
-            plugin.afkdata.logActionUnsafe(((Player) he).getName(), "InventoryOpenEvent");
+            plugin.afkdata.logAction(((Player) he).getName(), "iOpen");
         }
     }
 
+    @AFKAnnotation(event = "pSprint")//冲刺
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void event(PlayerToggleSprintEvent event) {
-        //11
-        plugin.afkdata.logActionUnsafe(event.getPlayer().getName(), "PlayerToggleSprintEvent");
+        plugin.afkdata.logAction(event.getPlayer().getName(), "pSprint");
 
     }
 
+    @AFKAnnotation(event = "pDeath")
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void event(PlayerDeathEvent event) {
-        //12
-        plugin.afkdata.logActionUnsafe(event.getEntity().getName(), "PlayerDeathEvent");
+        plugin.afkdata.logAction(event.getEntity().getName(), "pDeath");
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
