@@ -22,8 +22,6 @@ public class AFKData {
     public final Map<String, AFKPlayer> data = new HashMap<>();
     Clann plugin;
 
-    
-    
     static {
         byte index = 1;
         for (Method m : AFKData.class.getDeclaredMethods()) {
