@@ -5,41 +5,38 @@
  */
 package lol.clann.afk;
 
-
+import java.lang.reflect.Method;
 import lol.clann.Clann;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-public class afkData {
+public class AFkData {
 
-    public static Map<Integer, Byte> actions = new HashMap<>();
-    private Map<String, afkPlayer> afkData = new HashMap<>();
+    /**
+     * actions还可以继续优化,直接使用事件名称的hashCode,从而无需此数组
+     */
+    public static final Map<String, Byte> actions = new HashMap<>();
+    public final Map<String, AFKPlayer> data = new HashMap<>();
     Clann plugin;
 
     static {
-        initIndex("PlayerMoveEvent", 1);
-        initIndex("PlayerInteractEvent", 2);
-        initIndex("BlockBreakEvent", 3);
-        initIndex("BlockPlaceEvent", 4);
-        initIndex("PlayerChangedWorldEvent", 5);
-        initIndex("PlayerChatEvent", 6);
-        initIndex("PlayerCommandPreprocessEvent", 7);
-        initIndex("PlayerToggleSneakEvent", 8);
-        initIndex("InventoryClickEvent", 9);
-        initIndex("InventoryOpenEvent", 10);
-        initIndex("PlayerToggleSprintEvent", 11);
-        initIndex("PlayerDeathEvent", 12);
+        byte index = 1;
+        for (Method m : AFkData.class.getDeclaredMethods()) {
+            if (m.isAnnotationPresent(AFKAnnotation.class)) {
+                AFKAnnotation anno = m.getAnnotation(AFKAnnotation.class);
+                if (anno.index() != 0) {
+                    actions.put(m.getAnnotation(AFKAnnotation.class).event(), anno.index());
+                } else {
+                    actions.put(m.getAnnotation(AFKAnnotation.class).event(), index++);
+                }
+            }
+        }
     }
 
-    private static void initIndex(String name, int index) {
-        actions.put(name.hashCode(), (byte) index);
-    }
-
-    public afkData(Clann plugin) {
+    public AFkData(Clann plugin) {
         //初始化事件
         this.plugin = plugin;
         for (Player p : Bukkit.getOnlinePlayers()) {
@@ -48,47 +45,58 @@ public class afkData {
         BukkitTask bt = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
             @Override
             public void run() {
-                Collection<afkPlayer> c = afkData.values();
-                for (afkPlayer ap : c) {
-                    ap.isAFK();
+                synchronized (data) {
+                    for (AFKPlayer ap : data.values()) {
+                        ap.isAFK();//更新afk状态
+                        ap.refresh();//清除陈旧数据
+                    }
                 }
             }
-        }, 20, 60 * 20);
+        }, 20, 60 * 20);//一分钟检测一次
         plugin.tasks.add(bt);
     }
 
-    public void logActionUnsafe(String name, String event) {
-        byte action = actions.get(event.hashCode());
-        if (action != getLastAction(name)) {
-            afkData.get(name).logAction(action);
-        }
+    /**
+     * 记录事件
+     *
+     * @param name 玩家
+     * @param event 事件
+     */
+    public void logAction(String name, String event) {
+        byte action = actions.get(event);
+        data.get(name).logAction(action);
     }
 
-    public void logActionSafe(String name, String event) {
-        if (afkData.containsKey(name)) {
-            logActionUnsafe(name, event);
-        }
-    }
-
+    /*
+     *
+     * 获取玩家上次动作
+     */
     public byte getLastAction(String name) {
-        return afkData.get(name).getLastAction();
+        return data.get(name).getLastAction();
     }
 
     public void addPlayer(Player p) {
-        synchronized (afkData) {
-            afkData.put(p.getName(), new afkPlayer(p));
+        synchronized (data) {
+            data.put(p.getName(), new AFKPlayer(p));
         }
     }
 
     public void removePlayer(Player p) {
-        synchronized (afkData) {
-            afkData.remove(p);
+        synchronized (data) {
+            data.remove(p);
         }
     }
-    
-    public boolean isAFK(String name){
-        afkPlayer ap = afkData.get(name);
-        if(ap != null){
+
+    /**
+     * 返回玩家afk状态
+     *
+     * @param name
+     *
+     * @return
+     */
+    public boolean isAFK(String name) {
+        AFKPlayer ap = data.get(name);
+        if (ap != null) {
             return ap.AFK;
         }
         return true;
