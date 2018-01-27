@@ -32,7 +32,7 @@ public class AFKPlayer {
             long now = System.currentTimeMillis();
             while (actIt.hasNext()) {
                 actIt.next();
-                long time = ((Long) timeIt.next()).longValue();
+                long time = timeIt.next();
                 if (now - time > 60000L) {
                     actIt.remove();
                     timeIt.remove();
@@ -40,10 +40,10 @@ public class AFKPlayer {
             }
         }
     }
- 
+
     public void logAction(byte b) {
         actions.add(b);
-        times.add(Long.valueOf(System.currentTimeMillis()));
+        times.add(System.currentTimeMillis());
         if (actions.size() > 200) {//保持容量不超过200
             actions.removeFirst();
             times.removeFirst();

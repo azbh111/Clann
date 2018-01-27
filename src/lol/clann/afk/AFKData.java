@@ -75,7 +75,7 @@ public class AFKData {
         return data.get(name).getLastAction();
     }
 
-    public void addPlayer(Player p) {
+    public final void addPlayer(Player p) {
         synchronized (data) {
             data.put(p.getName(), new AFKPlayer(p));
         }
