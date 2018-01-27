@@ -72,7 +72,6 @@ public class Clann extends JavaPlugin {
                 mcLang_Lang = new File(this.getDataFolder(), "mcLanguage.lang");
                 LanguageApi.init();
                 log("语言映射建立完毕");
-                new Command();
             } catch (Throwable ex) {
                 ex.printStackTrace();
                 log("初始化过程出错");
