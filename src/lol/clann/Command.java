@@ -22,7 +22,7 @@ public class Command extends CustomCommand {
 
     @SubCommandAnnotation(mustPlayer = false, args = "(player)", des = "查看玩家afk状态")
     public void afk(CommandSender sender, String[] args) {
-        sender.sendMessage("AFK:" + Clann.plugin.afkdata.data.get(args[1]).isAFK());
-        sender.sendMessage("状态:" + Clann.plugin.afkdata.data.get(args[1]).actions.toString());
+        sender.sendMessage("AFK:" + Clann.plugin.afkdata.data.get(args[0]).isAFK());
+        sender.sendMessage("状态:" + Clann.plugin.afkdata.data.get(args[0]).actions.toString());
     }
 }
