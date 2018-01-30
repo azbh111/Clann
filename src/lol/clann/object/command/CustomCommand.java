@@ -171,10 +171,12 @@ public abstract class CustomCommand implements CommandExecutor {
 
     /**
      * 权限判断
+     *
      * @param sub
      * @param sender
      * @param notice
-     * @return 
+     *
+     * @return
      */
     private boolean hasPermission(SubCommand sub, CommandSender sender, boolean notice) {
         if (sub.annotation.mustPlayer() && !PlayerApi.isPlayer(sender)) {
@@ -200,9 +202,11 @@ public abstract class CustomCommand implements CommandExecutor {
 
     /**
      * 格式检查
+     *
      * @param sub
      * @param args
-     * @return 
+     *
+     * @return
      */
     private boolean checkParms(SubCommand sub, String[] args) {
         if (sub.annotation.args().isEmpty()) {
@@ -218,19 +222,26 @@ public abstract class CustomCommand implements CommandExecutor {
         }
         return args.length >= n;
     }
-    
+
     /**
      * 反射执行
+     *
      * @param sub
      * @param sender
      * @param args
-     * @throws Exception 
+     *
+     * @throws Exception
      */
-    private void handle(SubCommand sub, CommandSender sender, String[] args) throws Exception {
+    private void handle(SubCommand sub, CommandSender sender, String[] args) {
         if (!hasPermission(sub, sender, true)) {
             return;
         }
-        sub.method.invoke(this, sender, args);
+        try {
+            sub.method.invoke(this, sender, args);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            sender.sendMessage("指令执行过程中抛出异常" + e.getClass().getName() + "  " + e.getMessage());
+        }
     }
 
 }

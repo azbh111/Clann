@@ -18,8 +18,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import lol.clann.Clann;
 import lol.clann.api.FileApi;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -47,22 +50,26 @@ public class PackageScanner {
      * 初始化
      */
     static {
-        File dir = new File(Clann.plugin.getDataFolder().getParent());
-        List<String> all = FileApi.FileList(dir);
-        List<File> fs = new LinkedList();
-        all.forEach(s -> {
-            File f = new File(s);
-            if (f.getPath().endsWith(".jar")) {
-                fs.add(f);
-            }
-        });
-        fs.forEach(p -> {
-            try {
-                classes.addAll(scanJar(p));
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        });
+        if (Bukkit.getServer() != null) {
+            //扫描所有插件
+            File dir = new File(Clann.plugin.getDataFolder().getParent());
+            List<String> all = FileApi.FileList(dir);
+            List<File> fs = new LinkedList();
+            all.forEach(s -> {
+                File f = new File(s);
+                if (f.getPath().endsWith(".jar")) {
+                    fs.add(f);
+                }
+            });
+            fs.forEach(p -> {
+                try {
+                    classes.addAll(scanJar(p));
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            });
+        }
+
     }
 
     private static List<String> scanJar(File f) throws IOException {
@@ -85,15 +92,23 @@ public class PackageScanner {
      * 扫描指包下所有类
      *
      * @param pkgName
+     *
      * @return
      */
     public static List<String> Scann(String pkgName) {
         List<String> re = new LinkedList();
+        //扫描插件
         classes.forEach(p -> {
             if (p.startsWith(pkgName)) {
                 re.add(p);
             }
         });
+        try {
+            //扫描
+            re.addAll(new PackageScanner(pkgName).loadResource());
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
         return re;
     }
 
@@ -101,17 +116,17 @@ public class PackageScanner {
         String pkg = plugin.getClass().getPackage().getName();
         return Scann(pkg);
     }
-
-    private static List<String> Scann(PackageScanner scanner) {
-        List<String> list = null;
-        try {
-            list = scanner.loadResource();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        Clann.log("在包(" + scanner.pkgName + ")下扫描到" + list.size() + "个类");
-        return list;
-    }
+//
+//    private static List<String> Scann(PackageScanner scanner) {
+//        List<String> list = null;
+//        try {
+//            list = scanner.loadResource();
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
+//        }
+//        Clann.log("在包(" + scanner.pkgName + ")下扫描到" + list.size() + "个类");
+//        return list;
+//    }
 
     /**
      * 过滤,保留指定类/接口的子类/实现
@@ -137,6 +152,7 @@ public class PackageScanner {
      *
      * @param classList
      * @param annotation
+     *
      * @throws ClassNotFoundException
      */
     public static void AnnotationFilter(Collection<String> classList, Class annotation) throws ClassNotFoundException {
@@ -162,6 +178,7 @@ public class PackageScanner {
      * 真扫描
      *
      * @return
+     *
      * @throws IOException
      */
     private List<String> loadResource() throws IOException {
@@ -189,6 +206,7 @@ public class PackageScanner {
      * 根据URL判断是JAR包还是文件目录
      *
      * @param url
+     *
      * @return
      */
     private ResourceType determineType(URL url) {
@@ -205,7 +223,9 @@ public class PackageScanner {
      * 扫描JAR文件
      *
      * @param path
+     *
      * @return
+     *
      * @throws IOException
      */
     private List<String> scanJar(String path) throws IOException {
@@ -228,6 +248,7 @@ public class PackageScanner {
      * 扫描文件目录下的类
      *
      * @param path
+     *
      * @return
      */
     private List<String> scanFile(String path, String basePkg) {
@@ -264,6 +285,7 @@ public class PackageScanner {
      * 把路径字符串转换为包名. a/b/c/d -> a.b.c.d
      *
      * @param path
+     *
      * @return
      */
     public static String pathToPackage(String path) {
@@ -277,6 +299,7 @@ public class PackageScanner {
      * 包名转换为路径名
      *
      * @param pkg
+     *
      * @return
      */
     public static String packageToPath(String pkg) {
@@ -288,6 +311,7 @@ public class PackageScanner {
      * 将多个对象转换成字符串并连接起来
      *
      * @param objs
+     *
      * @return
      */
     public static String concat(Object... objs) {
@@ -302,6 +326,7 @@ public class PackageScanner {
      * 去掉文件的后缀名
      *
      * @param name
+     *
      * @return
      */
     public static String trimSuffix(String name) {
@@ -316,6 +341,7 @@ public class PackageScanner {
      * 文件RUL转换为文件路径
      *
      * @param u
+     *
      * @return
      */
     public static String distillPathFromFileURL(URL u) {
@@ -326,6 +352,7 @@ public class PackageScanner {
      * JarClassURL转换为文件路径
      *
      * @param u
+     *
      * @return
      */
     public static String distillPathFromJarClassURL(URL u) {

@@ -21,7 +21,7 @@ public class AFKData {
     public static final Map<String, Byte> actions = new HashMap<>();
     public final Map<String, AFKPlayer> data = new HashMap<>();
     Clann plugin;
-
+    
     static {
         byte index = 1;
         for (Method m : AFKListener.class.getDeclaredMethods()) {
@@ -35,7 +35,7 @@ public class AFKData {
             }
         }
     }
-
+    
     public AFKData(Clann plugin) {
         //初始化事件
         this.plugin = plugin;
@@ -64,7 +64,12 @@ public class AFKData {
      */
     public void logAction(String name, String event) {
         byte action = actions.get(event);
-        data.get(name).logAction(action);
+        AFKPlayer p = data.get(name);
+        if (p != null) {
+            p.logAction(action);
+        } else {
+            Clann.log("玩家" + name + "未在线");
+        }
     }
 
     /*
@@ -74,13 +79,13 @@ public class AFKData {
     public byte getLastAction(String name) {
         return data.get(name).getLastAction();
     }
-
+    
     public final void addPlayer(Player p) {
         synchronized (data) {
             data.put(p.getName(), new AFKPlayer(p));
         }
     }
-
+    
     public void removePlayer(Player p) {
         synchronized (data) {
             data.remove(p);
