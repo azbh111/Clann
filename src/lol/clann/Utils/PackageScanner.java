@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lol.clann.Clann;
 import lol.clann.api.FileApi;
 import org.bukkit.Bukkit;
