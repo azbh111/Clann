@@ -98,15 +98,28 @@ public class ReflectApi {
     public static RefClass Entity = getRefClass(CraftEntity_entity);
 
     public static RefClass CraftPlayer = getRefClass("{cb}.entity.CraftPlayer, {CraftPlayer}");
+    public static RefClass cHumanEntity = getRefClass(CraftPlayer.getRealClass().getSuperclass());
+    public static RefMethod cHumanEntity_getInventory = cHumanEntity.getMethod("getInventory");
+    public static RefField cHumanEntity_inventory = cHumanEntity.getField("inventory");
+    public static RefClass cPlayerInventory = cHumanEntity_inventory.getFieldRefClass();
+    public static RefMethod cPlayerInventory_getInventory = cPlayerInventory.getMethod("getInventory");
+    public static RefClass InventoryPlayer = cPlayerInventory_getInventory.getReturnRefClass();
+
     public static RefMethod CraftPlayer_getHandle = CraftPlayer.findMethodByName("getHandle");
-    public static RefClass EntityPlayerMP = CraftPlayer_getHandle.getReturnRefClass();
-    public static RefClass EntityPlayer = getRefClass(EntityPlayerMP.getRealClass().getSuperclass());
-    public static RefClass EntityLivingBase = getRefClass(EntityPlayer.getRealClass().getSuperclass());
+    //fuck mojang,这里反射出来EntityPlayerMP有可能是net.minecraft.entity.EntityLivingBase,也有可能是net.minecraft.entity.player.EntityLivingBase,你咋不上天呢
+//    public static RefClass EntityPlayerMP = print("EntityPlayerMP",CraftPlayer_getHandle.getReturnRefClass());
+    public static RefClass EntityPlayerMP = print("EntityPlayerMP",getRefClass("{nms}.entity.player.EntityPlayerMP, {nm}.entity.player.EntityPlayerMP, {EntityPlayerMP}"));
+    public static RefClass EntityPlayer = print("EntityPlayer",getRefClass(EntityPlayerMP.getRealClass().getSuperclass()));
+    public static RefClass EntityLivingBase = print("EntityLivingBase",getRefClass(EntityPlayer.getRealClass().getSuperclass()));
+    
+    public static RefClass print(String key,RefClass c){
+        System.out.println(key+":"+c.getRealClass().getName());
+        return c;
+    }
 //    public static RefClass EntityLivingBase = getRefClass("{nms}.EntityLivingBase, {nm}.entity.EntityLivingBase, {EntityLivingBase}");
 
 //    public static RefClass EntityPlayer = getRefClass("{nms}.EntityPlayer, {nm}.entity.player.EntityPlayer, {EntityPlayer}");
-    public static RefField EntityPlayer_inventory = getField(EntityPlayer, "inventory");
-    public static RefClass InventoryPlayer = getRefClass(EntityPlayer_inventory.getRealField().getType());
+    public static RefField EntityPlayer_inventory = EntityPlayer.findField(InventoryPlayer);
     public static RefMethod InventoryPlayer_writeToNBT = getMethod(InventoryPlayer, NBTTagList, "writeToNBT", new Object[]{NBTTagList});
     public static RefMethod InventoryPlayer_readFromNBT = getMethod(InventoryPlayer, null, "readFromNBT", new Object[]{NBTTagList});
     public static RefField<Integer> InventoryPlayer_currentItem = getField(InventoryPlayer, "currentItem");

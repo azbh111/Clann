@@ -330,7 +330,7 @@ public class RefClass<T> {
         if (type == null) {
             type = (Class<P>) void.class;
         }
-        List<Field> fields = new ArrayList<Field>();
+        List<Field> fields = new ArrayList();
         Collections.addAll(fields, clazz.getFields());
         Collections.addAll(fields, clazz.getDeclaredFields());
         for (Field f : fields) {
@@ -338,7 +338,7 @@ public class RefClass<T> {
                 return new RefField(f);
             }
         }
-        throw new RuntimeException("no such field");
+        throw new RuntimeException("no such field:"+type.getName()+" in class:"+clazz.getName());
     }
 
 }
