@@ -60,24 +60,78 @@ public class WrapClass<T> {
         throw new RuntimeException("No Constructor find:(" + paramsToClassString(params) + ")");
     }
 
-    
-    public void set(Object handle,String name,Object value) throws Exception{
+    public void set(Object handle, String name, Object value) throws Exception {
         Field f = fields.get(name);
         if (f == null) {
             throw new RuntimeException("No Field find:" + name);
         }
         f.set(handle, value);
     }
-    
+
     /**
      * 获取属性
      */
     public Object get(Object handle, String name) throws Exception {
+        Field f = getField(name);
+        return f.get(handle);
+    }
+
+    /**
+     * 根据类别返回属性
+     *
+     * @param clazz
+     *
+     * @return
+     */
+    public Field getField(Class clazz) {
+        Field re = null;
+        for (Field f : fields.values()) {
+            if (f.getType() == clazz) {
+                if (re == null) {
+                    re = f;
+                } else {
+                    throw new RuntimeException("One more fields that type are " + clazz.getName() + " find");
+                }
+            }
+        }
+        if (re == null) {
+            throw new RuntimeException("No Field find: type=" + clazz.getName());
+        }
+        return re;
+    }
+
+    /**
+     * 根据名称返回属性
+     *
+     * @param name
+     *
+     * @return
+     */
+    public Field getField(String name) {
         Field f = fields.get(name);
         if (f == null) {
-            throw new RuntimeException("No Field find:" + name);
+            throw new RuntimeException("No Field find: name=" + name);
         }
-        return f.get(handle);
+        return f;
+    }
+
+    /**
+     * 根据名字和参数返回方法
+     *
+     * @param name
+     * @param params
+     *
+     * @return
+     */
+    public Method getMethod(String name, Object... params) {
+        Method[] ms = methods.get(name);
+        Method m = null;
+        for (Method tm : ms) {
+            if (check(tm.getParameterTypes(), params)) {
+                return tm;
+            }
+        }
+        throw new RuntimeException("No Such Method find:" + name + "(" + paramsToClassString(params) + ")");
     }
 
     /**
@@ -90,17 +144,7 @@ public class WrapClass<T> {
      * @return
      */
     public Object invoke(Object handle, String name, Object... params) throws Exception {
-        Method[] ms = methods.get(name);
-        Method m = null;
-        for (Method tm : ms) {
-            if (check(tm.getParameterTypes(), params)) {
-                m = tm;
-                break;
-            }
-        }
-        if (m == null) {
-            throw new RuntimeException("No Method find:" + name + "(" + paramsToClassString(params) + ")");
-        }
+        Method m = getMethod(name, params);
         return m.invoke(handle, params);
     }
 
@@ -173,16 +217,22 @@ public class WrapClass<T> {
      * @return
      */
     private boolean canCast(Class clazz, Object o) {
-        if (clazz == o.getClass()) {
+        Class tClazz;
+        if (o instanceof Class) {
+            tClazz = (Class) o;
+        } else {
+            tClazz = o.getClass();
+        }
+        if (clazz == tClazz) {
             return true;
         }
-        if (clazz.isInstance(o)) {
+        if (clazz.isAssignableFrom(tClazz)) {
             return true;//父类
         }
         if (isNumber(clazz)) {//clazz必须是基本数据类型,o才能转换
-            int level = getNumberLevel(o.getClass());
+            int level = getNumberLevel(tClazz);
             if (level == Integer.MAX_VALUE) {
-                if (o.getClass() == char.class) {
+                if (tClazz == char.class) {
                     level = 3;
                 }
             }
@@ -190,10 +240,10 @@ public class WrapClass<T> {
                 return true;
             }
         } else {
-            if (clazz == char.class && o.getClass() == Character.class) {
+            if (clazz == char.class && tClazz == Character.class) {
                 return true;
             }
-            if (clazz == Character.class && o.getClass() == char.class) {
+            if (clazz == Character.class && tClazz == char.class) {
                 return true;
             }
         }

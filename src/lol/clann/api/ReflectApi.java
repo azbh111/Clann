@@ -98,16 +98,23 @@ public class ReflectApi {
     public static RefClass Entity = getRefClass(CraftEntity_entity);
 
     public static RefClass CraftPlayer = getRefClass("{cb}.entity.CraftPlayer, {CraftPlayer}");
-    public static RefClass EntityLivingBase = getRefClass("{nms}.EntityLivingBase, {nm}.entity.EntityLivingBase, {EntityLivingBase}");
+    public static RefMethod CraftPlayer_getHandle = CraftPlayer.findMethodByName("getHandle");
+    public static RefClass EntityPlayerMP = CraftPlayer_getHandle.getReturnRefClass();
+    public static RefClass EntityPlayer = getRefClass(EntityPlayerMP.getRealClass().getSuperclass());
+    public static RefClass EntityLivingBase = getRefClass(EntityPlayer.getRealClass().getSuperclass());
+//    public static RefClass EntityLivingBase = getRefClass("{nms}.EntityLivingBase, {nm}.entity.EntityLivingBase, {EntityLivingBase}");
 
-    public static RefClass EntityPlayer = getRefClass("{nms}.EntityPlayer, {nm}.entity.player.EntityPlayer, {EntityPlayer}");
+//    public static RefClass EntityPlayer = getRefClass("{nms}.EntityPlayer, {nm}.entity.player.EntityPlayer, {EntityPlayer}");
     public static RefField EntityPlayer_inventory = getField(EntityPlayer, "inventory");
-    public static RefMethod CraftPlayer_getHandle = CraftPlayer.findMethodByReturnType(EntityPlayer);
-
     public static RefClass InventoryPlayer = getRefClass(EntityPlayer_inventory.getRealField().getType());
+    public static RefMethod InventoryPlayer_writeToNBT = getMethod(InventoryPlayer, NBTTagList, "writeToNBT", new Object[]{NBTTagList});
+    public static RefMethod InventoryPlayer_readFromNBT = getMethod(InventoryPlayer, null, "readFromNBT", new Object[]{NBTTagList});
     public static RefField<Integer> InventoryPlayer_currentItem = getField(InventoryPlayer, "currentItem");
 
-    public static RefClass EntityPlayerMP = getRefClass("{nms}.EntityPlayerMP, {nm}.entity.player.EntityPlayerMP, {EntityPlayerMP}");
+    public static RefField EntityPlayer_theInventoryEnderChest = getField(EntityPlayer, "theInventoryEnderChest");
+    public static RefClass InventoryEnderChest = EntityPlayer_theInventoryEnderChest.getFieldRefClass();
+    public static RefMethod InventoryEnderChest_saveInventoryToNBT = getMethod(InventoryEnderChest, NBTTagList, "saveInventoryToNBT", new Object[]{});
+    public static RefMethod InventoryEnderChest_loadInventoryFromNBT = getMethod(InventoryEnderChest, null, "loadInventoryFromNBT", new Object[]{NBTTagList});
 
     public static RefClass TileEntity = getRefClass("{nms}.TileEntity, {nm}.tileentity.TileEntity, {TileEntity}");
     public static RefMethod TileEntity_writeToNBT = getMethod(TileEntity, null, "writeToNBT", new Object[]{NBTTagCompound});
@@ -153,10 +160,7 @@ public class ReflectApi {
     public static RefMethod EntityPlayerMP_closeScreen = getMethod(EntityPlayerMP, null, "closeScreen", null);
     public static RefMethod EntityLivingBase_clearActivePotions = getMethod(EntityLivingBase, null, "clearActivePotions", null);
     public static RefMethod NetHandlerPlayServer_sendPacket = getMethod(NetHandlerPlayServer, null, "sendPacket", new Object[]{Packet});
-//    public static RefField<Integer> Item_itemDamage = getField(Item, "itemDamage");
-//    public static RefField Item_itemRegistry = getField(Item, "itemRegistry");
-//    public static RefClass RegistryNamespaced = Item_itemRegistry.getRefClass();
-//    public static RefMethod<String> RegistryNamespaced_getNameForObject = getMethod(RegistryNamespaced, String.class, "getNameForObject", new Object[]{Object.class});
+
     public static RefClass BlockLiquid = null;
     public static RefClass BlockFluidBase = null;
 

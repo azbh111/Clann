@@ -15,7 +15,7 @@ public @interface SubCommandAnnotation {
      * 参数(变量)  [可选变量]
      * @return 
      */
-    String args() default ""; //命令参数
+    String[] args() default {""}; //命令参数
 
     /**
      * 介绍

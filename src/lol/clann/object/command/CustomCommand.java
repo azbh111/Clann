@@ -10,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -37,19 +38,28 @@ public abstract class CustomCommand implements CommandExecutor {
 
     public CustomCommand(JavaPlugin plugin, String cmd) {
         this.cmd = cmd;
+        register(getClass());
+        plugin.getCommand(cmd).setExecutor(this);
+    }
+
+    /**
+     * 注册类
+     *
+     * @param clazz
+     */
+    public void register(Class clazz) {
         SubCommandAnnotation sub;
-        for (Method method : getClass().getDeclaredMethods()) {
+        for (Method method : clazz.getDeclaredMethods()) {
             if (method.isAnnotationPresent(SubCommandAnnotation.class)) {
                 method.setAccessible(true);
                 sub = method.getAnnotation(SubCommandAnnotation.class);
-                if (sub.des().length > 1 && sub.des().length % 2 != 0) {
-                    //des描述不成对
-                    throw new SubCommandAnnotationException("当存在多个des描述时,应成对存在:" + sub.des().length);
+                if (sub.des().length != sub.args().length) {
+                    //指令描述描述不成对
+                    throw new SubCommandAnnotationException("指令与描述不成对");
                 }
                 subCommands.put(method.getName().toLowerCase(), new SubCommand(sub, method));
             }
         }
-        plugin.getCommand(cmd).setExecutor(this);
     }
 
     public String getCmd() {
@@ -63,13 +73,8 @@ public abstract class CustomCommand implements CommandExecutor {
      * @param sub
      */
     public final void help(CommandSender sender, SubCommand sub) {
-        if (sub.annotation.des().length == 1) {
-            sendMessage(sender, sub, " &6-&a " + sub.annotation.des()[0]);
-        } else {
-            //描述成对存在,分别发送
-            for (int i = 0; i + 1 < sub.annotation.des().length; i += 2) {
-                sendMessage(sender, sub, sub.annotation.des()[i], " &6-&a " + sub.annotation.des()[i + 1]);
-            }
+        for (int i = 0; i < sub.annotation.args().length; i++) {
+            sendMessage(sender, sub, sub.annotation.args()[i], "    &6-&a " + sub.annotation.des()[i]);
         }
     }
 
@@ -82,21 +87,8 @@ public abstract class CustomCommand implements CommandExecutor {
      * @param format
      */
     private void sendMessage(CommandSender sender, SubCommand sub, String format, String message) {
-        Tellraw c = new Tellraw(("&6/" + cmd + " &b" + sub.method.getName() + " &3" + format).trim());
+        Tellraw c = new Tellraw(("&6/" + cmd + " &b" + sub.method.getName() + "&3 " + format).trim());
         c.getChatStyle().setClickEvent(ClickEvent.Action.suggest_command, ("/" + cmd + " " + sub.method.getName() + " " + format).trim());
-        c.addText(message).sendToPlayer(sender);
-    }
-
-    /**
-     * 直接使用SubCommand生成指令格式
-     *
-     * @param sender
-     * @param message
-     * @param sub
-     */
-    private void sendMessage(CommandSender sender, SubCommand sub, String message) {
-        Tellraw c = new Tellraw(("&6/" + cmd + " &b" + sub.method.getName() + " &3" + sub.annotation.args()).trim());
-        c.getChatStyle().setClickEvent(ClickEvent.Action.suggest_command, ("/" + cmd + " " + sub.method.getName() + " " + sub.annotation.args()).trim());
         c.addText(message).sendToPlayer(sender);
     }
 
@@ -141,7 +133,7 @@ public abstract class CustomCommand implements CommandExecutor {
             SubCommand sub = subCommands.get(args[0].toLowerCase());
             if (sub != null) {
                 try {
-                    if (!checkParms(sub, temp)) {
+                    if (!checkParams(sub, temp)) {
                         sender.sendMessage("格式错误");
                         help(sender, sub);
                         return true;
@@ -207,15 +199,25 @@ public abstract class CustomCommand implements CommandExecutor {
      *
      * @return
      */
-    private boolean checkParms(SubCommand sub, String[] args) {
-        if (sub.annotation.args().isEmpty()) {
-            return true;
+    private boolean checkParams(SubCommand sub, String[] args) {
+        String[] ss = sub.annotation.args();
+        for (int i = 0; i < ss.length; i++) {
+            if (checkParams(ss[i], args)) {
+                return true;
+            }
         }
-        String parms[] = sub.annotation.args().split(" ");
+        return false;
+    }
+
+    private boolean checkParams(String param, String[] args) {
+        String parms[] = param.split(" ");
         int n = 0;
         for (int i = 0; i < parms.length; i++) {
             if (parms[i].isEmpty() || (parms[i].startsWith("[") && parms[i].endsWith("]"))) {
                 continue;
+            }
+            if (!parms[i].startsWith("(") && !parms[i].equals(args[i])) {
+                return false;
             }
             n++;
         }
@@ -236,7 +238,11 @@ public abstract class CustomCommand implements CommandExecutor {
             return;
         }
         try {
-            sub.method.invoke(this, sender, args);
+            if(sub.annotation.mustPlayer()){
+                sub.method.invoke(this, (Player)sender, args);
+            }else{
+                sub.method.invoke(this, sender, args);
+            }
         } catch (Throwable e) {
             e.printStackTrace();
             sender.sendMessage("指令执行过程中抛出异常" + e.getClass().getName() + "  " + e.getMessage());
