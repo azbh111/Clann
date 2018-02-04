@@ -4,6 +4,8 @@ import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import lol.clann.Utils.ObscureUtil;
 import lol.clann.afk.AFKData;
 import lol.clann.api.*;
@@ -31,9 +33,8 @@ public class Clann extends JavaPlugin {
     public AFKData afkdata;
     public File modLang_Lang = null;
     public File mcLang_Lang = null;
-
     private static final boolean startUp;
-
+    private static Logger _logger;
 //    public Clann() {
 //
 //    }
@@ -54,6 +55,7 @@ public class Clann extends JavaPlugin {
         if (startUp) {
             try {
                 plugin = this;
+                _logger = getLogger();
                 if (!setupPermissions()) {
                     log("权限系统加载失败");
                     Bukkit.shutdown();
@@ -90,15 +92,22 @@ public class Clann extends JavaPlugin {
     }
 
     public void registerListener() {
+        
         Bukkit.getPluginManager().registerEvents(new AFKListener(this), this);
         Bukkit.getPluginManager().registerEvents(new InventoryClickInterval(), this);
         Bukkit.getPluginManager().registerEvents(new ThreadManager(), this);
     }
 
     public static void log(String s) {
-        System.out.println("[Clann]" + s);
-    }
-
+        _logger.log(Level.INFO, s);
+    }   
+    public static void logError(String s) {
+        _logger.log(Level.SEVERE, s);
+    } 
+    public static void logWarning(String s) {
+        _logger.log(Level.WARNING, s);
+    } 
+    
     public static boolean startUp() {
         return startUp;
     }

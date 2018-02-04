@@ -238,14 +238,24 @@ public abstract class CustomCommand implements CommandExecutor {
             return;
         }
         try {
-            if(sub.annotation.mustPlayer()){
-                sub.method.invoke(this, (Player)sender, args);
-            }else{
+            if (sub.annotation.mustPlayer()) {
+                sub.method.invoke(this, (Player) sender, args);
+            } else {
                 sub.method.invoke(this, sender, args);
             }
         } catch (Throwable e) {
-            e.printStackTrace();
-            sender.sendMessage("指令执行过程中抛出异常" + e.getClass().getName() + "  " + e.getMessage());
+            Throwable ce;
+            String info = "指令执行过程中抛出";
+            ce = e;
+            while (ce != null && !(ce instanceof CEException)) {
+                ce = ce.getCause();
+            }
+            if (ce != null) {
+                info += "异常:" + ce.getMessage();
+            } else {
+                info += e.getClass().getName() + "异常:" + e.getMessage();
+            }
+            sender.sendMessage(info);
         }
     }
 

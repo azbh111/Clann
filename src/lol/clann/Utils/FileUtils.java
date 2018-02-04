@@ -39,7 +39,7 @@ public class FileUtils {
      * @return
      */
     public static String getPathByUUID(UUID uuid, int count, int perLength) {
-        String uid = uuid.toString();
+        String uid = uuid.toString().replace("-", "");
         if (perLength * count > uid.length()) {
             throw new RuntimeException("单位长度与个数之积应小于uuid长度");
         }
@@ -47,7 +47,7 @@ public class FileUtils {
         for (int i = 0; i < count; i++) {
             s += uid.substring(perLength * i, perLength * i + 2) + File.separator;
         }
-        s += uid;
+        s += uuid.toString();
         return s;
     }
 
@@ -56,13 +56,11 @@ public class FileUtils {
      *
      * @param folder
      * @param uuid
+     * @return 
      */
     public static File getFileByUUID(File folder, UUID uuid) {
         String s = getPathByUUID(uuid, 4, 2);
         File f = new File(folder, s);
-        if (!f.exists()) {
-            throw new RuntimeException(uuid.toString() + "指定位置的文件不存在");
-        }
         return f;
     }
 
@@ -73,10 +71,11 @@ public class FileUtils {
      * @param uuid uuid
      * @param data
      */
-    public static void saveByUUID(File folder, byte[] data, UUID uuid) {
+    public static File saveByUUID(File folder, byte[] data, UUID uuid) {
         String s = getPathByUUID(uuid, 4, 2);
         File f = getFile(folder.getPath() + File.separator + s, true);
         writeData(f, false, data);
+        return f;
     }
 
     /**
