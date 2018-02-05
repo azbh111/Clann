@@ -108,12 +108,12 @@ public class ReflectApi {
     public static RefMethod CraftPlayer_getHandle = CraftPlayer.findMethodByName("getHandle");
     //fuck mojang,这里反射出来EntityPlayerMP有可能是net.minecraft.entity.EntityLivingBase,也有可能是net.minecraft.entity.player.EntityLivingBase,你咋不上天呢
 //    public static RefClass EntityPlayerMP = print("EntityPlayerMP",CraftPlayer_getHandle.getReturnRefClass());
-    public static RefClass EntityPlayerMP = print("EntityPlayerMP",getRefClass("{nms}.entity.player.EntityPlayerMP, {nm}.entity.player.EntityPlayerMP, {EntityPlayerMP}"));
-    public static RefClass EntityPlayer = print("EntityPlayer",getRefClass(EntityPlayerMP.getRealClass().getSuperclass()));
-    public static RefClass EntityLivingBase = print("EntityLivingBase",getRefClass(EntityPlayer.getRealClass().getSuperclass()));
-    
-    public static RefClass print(String key,RefClass c){
-        System.out.println(key+":"+c.getRealClass().getName());
+    public static RefClass EntityPlayerMP = getRefClass("{nms}.entity.player.EntityPlayerMP, {nm}.entity.player.EntityPlayerMP, {EntityPlayerMP}");
+    public static RefClass EntityPlayer = getRefClass(EntityPlayerMP.getRealClass().getSuperclass());
+    public static RefClass EntityLivingBase = getRefClass(EntityPlayer.getRealClass().getSuperclass());
+
+    public static RefClass print(String key, RefClass c) {
+        System.out.println(key + ":" + c.getRealClass().getName());
         return c;
     }
 //    public static RefClass EntityLivingBase = getRefClass("{nms}.EntityLivingBase, {nm}.entity.EntityLivingBase, {EntityLivingBase}");
@@ -183,20 +183,20 @@ public class ReflectApi {
     static {
         try {
             BlockLiquid = getRefClass("{nms}.BlockLiquid, {nm}.block.BlockLiquid, {BlockLiquid}");
-            Clann.log("detect " + BlockLiquid.getRealClass().getName());
+            ClannAPI.log("detect " + BlockLiquid.getRealClass().getName());
         } catch (Throwable e) {
             try {
                 BlockLiquid = getRefClass("{nms}.BlockFluids, {nm}.block.BlockFluids, {BlockFluids}");
-                Clann.log("detect " + BlockLiquid.getRealClass().getName());
+                ClannAPI.log("detect " + BlockLiquid.getRealClass().getName());
             } catch (Throwable ee) {
-                Clann.log("not detect BlockLiquid");
+                ClannAPI.log("not detect BlockLiquid");
             }
         }
         try {
             BlockFluidBase = getRefClass("net.minecraftforge.fluids.BlockFluidBase");
-            Clann.log("detect " + BlockFluidBase.getRealClass().getName());
+            ClannAPI.log("detect " + BlockFluidBase.getRealClass().getName());
         } catch (Throwable e) {
-            Clann.log("not detect BlockFluidBase");
+            ClannAPI.log("not detect BlockFluidBase");
         }
     }
 

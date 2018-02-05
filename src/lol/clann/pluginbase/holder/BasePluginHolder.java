@@ -25,4 +25,5 @@ public class BasePluginHolder {
     public static BasePlugin get(String name){
         return pluginMap.get(name);
     }
+
 }

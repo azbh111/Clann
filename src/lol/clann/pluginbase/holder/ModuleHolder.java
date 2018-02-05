@@ -15,10 +15,15 @@ import lol.clann.pluginbase.*;
  * @author zyp
  */
 public class ModuleHolder {
-
+    
+    BasePlugin plugin;
     //记录所有模块
     private final HashMap<String, Module> modules = new HashMap();
-
+    
+    public ModuleHolder(BasePlugin plugin) {
+        this.plugin = plugin;
+    }
+    
     public Module get(String s) {
         return modules.get(s);
     }
@@ -35,7 +40,7 @@ public class ModuleHolder {
             Module m = it.next().getValue();
             ArrayList<String> not = enable(m);
             if (!not.isEmpty()) {
-                Clann.log("模块" + m.getName() + "缺少依赖:" + not.toString() + ",放弃加载");
+                plugin.log("模块" + m.getName() + "缺少依赖:" + not.toString() + ",放弃加载");
                 it.remove();
             }
         }
@@ -57,7 +62,7 @@ public class ModuleHolder {
         ArrayList<String> dp = m.getDepend();
         if (dp.size() == 1) {
             m.enable();
-            Clann.log("enable module:" + m.getName());
+            plugin.log("enable module:" + m.getName());
         } else {
             for (String s : dp) {
                 Module d = modules.get(s);
@@ -69,7 +74,7 @@ public class ModuleHolder {
             }
             if (re.isEmpty()) {
                 m.enable();
-                Clann.log("enable module:" + m.getName());
+                plugin.log("enable module:" + m.getName());
             }
         }
         return re;
@@ -90,7 +95,7 @@ public class ModuleHolder {
             }
         }
         m.disable();
-        Clann.log("disable module:" + m.getName());
+        plugin.log("disable module:" + m.getName());
     }
 
     /**

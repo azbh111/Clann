@@ -8,6 +8,7 @@ package lol.clann.pluginbase;
 import java.io.*;
 import lol.clann.pluginbase.BaseAPI;
 import lol.clann.pluginbase.BasePlugin;
+import lol.clann.pluginbase.api.Configable;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -24,14 +25,15 @@ public class BaseConfiguration {
         this(holder, null, fileName);
     }
 
-    public BaseConfiguration(BasePlugin holder, File folder, String fileName) {
+    public BaseConfiguration(BasePlugin holder, String folder, String fileName) {
         if (folder == null) {
             configurationFile = new File(holder.getDataFolder(), fileName);
         } else {
-            if (!folder.exists()) {
-                folder.mkdirs();
+            File dir = new File(holder.getDataFolder(),folder);
+            if (!dir.exists()) {
+                dir.mkdirs();
             }
-            configurationFile = new File(folder, fileName);
+            configurationFile = new File(dir, fileName);
         }
         if (!configurationFile.exists()) {
             BaseAPI.saveResource(holder, fileName, configurationFile.getParentFile(), true);

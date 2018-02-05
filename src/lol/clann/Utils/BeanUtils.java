@@ -3,22 +3,34 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package lol.clann.object.bean;
+package lol.clann.Utils;
 
-import java.lang.reflect.*;
-import java.util.*;
-import lol.clann.Clann;
-import lol.clann.Utils.PackageScanner;
-import org.bukkit.craftbukkit.libs.com.google.gson.*;
+import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import lol.clann.ClannAPI;
+import lol.clann.object.bean.BeansAnnotation;
+import lol.clann.object.bean.ComponentType;
+import lol.clann.object.bean.FieldSelector;
+import org.bukkit.craftbukkit.libs.com.google.gson.JsonArray;
+import org.bukkit.craftbukkit.libs.com.google.gson.JsonElement;
+import org.bukkit.craftbukkit.libs.com.google.gson.JsonObject;
+import org.bukkit.craftbukkit.libs.com.google.gson.JsonPrimitive;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.json.JSONObject;
 
 /**
- * 只允许基本数据类型、String和以上类型的数组
  *
  * @author zyp
  */
-@BeansAnnotation
-public abstract class Beans {
+public class BeanUtils {
 
     /**
      * 存储所有Beans类的属性
@@ -29,37 +41,27 @@ public abstract class Beans {
      */
     private static final Map<Class, Field> selectors = new HashMap();
 
-    private static final Field value;
-
-    static {
-        try {
-            value = JsonPrimitive.class.getDeclaredField("value");
-            value.setAccessible(true);
-        } catch (NoSuchFieldException ex) {
-            throw new RuntimeException(ex);
-        }
-        registerPackage("lol.clann.beans");
-    }
     /**
      * 注册插件jar包里的bean
-     * @param plg 
+     *
+     * @param plg
      */
-    public static void registerPlugin(JavaPlugin plg){
-       //注册所有Beans类
+    public static void registerPlugin(JavaPlugin plg) {
+        //注册所有Beans类
         List<String> classes = PackageScanner.Scann(plg);
         for (String s : classes) {
             try {
                 Class clazz = Class.forName(s);
                 if (clazz.isAnnotationPresent(BeansAnnotation.class)) {
                     registerClass(clazz);
-                    Clann.logError("注册Bean失败:" + clazz.getName());
+                    ClannAPI.logError("注册Bean失败:" + clazz.getName());
                 }
             } catch (Throwable e) {
                 e.printStackTrace();
             }
         }
     }
-    
+
     /**
      * 注册指定包下的Bean类
      *
@@ -73,7 +75,7 @@ public abstract class Beans {
                 Class clazz = Class.forName(s);
                 if (clazz.isAnnotationPresent(BeansAnnotation.class)) {
                     registerClass(clazz);
-                    Clann.logError("注册Bean失败:" + clazz.getName());
+                    ClannAPI.logError("注册Bean失败:" + clazz.getName());
                 }
             } catch (Throwable e) {
                 e.printStackTrace();
@@ -103,14 +105,13 @@ public abstract class Beans {
         }
     }
 
-    @Override
-    public String toString() {
-        return toJson().toString();
+    public static String toString(Object o) {
+        return toJson(o).toString();
     }
 
-    public JsonElement toJson() {
+    public static JSONObject toJson(Object o) {
         try {
-            return toJson.toJsonElement(this);
+            return new JSONObject(toJson.toJsonElement(o).toString());
         } catch (Exception ex) {
             throw new RuntimeException("转换为Json失败", ex);
         }
@@ -127,8 +128,23 @@ public abstract class Beans {
      *
      * @throws Exception
      */
-    public static <T extends Beans> T create(Class<T> clazz, JsonObject json) throws Exception {
-        return fromJson.create(clazz, json);
+    public static <T> T create(Class<T> clazz, JSONObject json) throws Exception {
+        return fromJson.create(clazz, JSONUtils.bukkitJsonParser.parse(json.toString()).getAsJsonObject());
+    }
+
+    /**
+     * 把json数序转入现有的bean对象
+     *
+     * @param <T>
+     * @param clazz
+     * @param json
+     *
+     * @return
+     *
+     * @throws Exception
+     */
+    public static <T> T build(T instance, JSONObject json) throws Exception {
+        return fromJson.build(instance, JSONUtils.bukkitJsonParser.parse(json.toString()).getAsJsonObject());
     }
 
     public static boolean isBeans(Object o) {
@@ -149,7 +165,7 @@ public abstract class Beans {
      *
      * @return
      */
-    private static <T extends Beans> Class<T> selectClass(Class<T> clazz, JsonObject json) {
+    private static <T> Class<T> selectClass(Class<T> clazz, JsonObject json) {
         Field inner = selectors.get(clazz);
         if (inner != null) {
             if (Modifier.isAbstract(clazz.getModifiers())) {
@@ -294,26 +310,8 @@ public abstract class Beans {
             }
         }
 
-        /**
-         * 根据Json创建Beans
-         *
-         * @param <T>
-         * @param clazz
-         * @param json
-         *
-         * @return
-         *
-         * @throws Exception
-         */
-        public static <T extends Beans> T create(Class<T> clazz, JsonObject json) throws Exception {
-            clazz = selectClass(clazz, json);
-            T instance;
-            try {
-                instance = clazz.newInstance();
-            } catch (IllegalAccessException | InstantiationException ex) {
-                Clann.logWarning("实例化失败:" + clazz.getName());
-                throw ex;
-            }
+        public static <T> T build(T instance, JsonObject json) throws Exception {
+            Class clazz = instance.getClass();
             Map<String, Field> fs = classFields.get(clazz);
             if (fs == null) {
                 throw new RuntimeException("类" + clazz.getName() + "未注册,无法解析为Beans");
@@ -326,10 +324,33 @@ public abstract class Beans {
                     Object o = createObject(f, f.getType(), value);
                     f.set(instance, o);
                 } else {
-                    Clann.logWarning(clazz.getName() + "中没有属性:" + key + ",忽略之");
+                    ClannAPI.logWarning(clazz.getName() + "中没有属性:" + key + ",忽略之");
                 }
             }
             return instance;
+        }
+
+        /**
+         * 根据Json创建Beans
+         *
+         * @param <T>
+         * @param clazz
+         * @param json
+         *
+         * @return
+         *
+         * @throws Exception
+         */
+        public static <T> T create(Class<T> clazz, JsonObject json) throws Exception {
+            clazz = selectClass(clazz, json);
+            T instance;
+            try {
+                instance = clazz.newInstance();
+            } catch (IllegalAccessException | InstantiationException ex) {
+                ClannAPI.logWarning("实例化失败:" + clazz.getName());
+                throw ex;
+            }
+            return build(instance, json);
         }
 
         /**
@@ -453,5 +474,4 @@ public abstract class Beans {
         }
 
     }
-
 }

@@ -12,12 +12,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lol.clann.Utils.BeanUtils;
 import lol.clann.Utils.PackageScanner;
 import lol.clann.pluginbase.api.AutoRegister;
+import lol.clann.pluginbase.api.Configable;
 import lol.clann.pluginbase.api.ILogger;
 import lol.clann.pluginbase.holder.ModuleHolder;
 import lol.clann.pluginbase.holder.ThreadHolder;
-import lol.clann.object.bean.Beans;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -25,55 +26,73 @@ import org.bukkit.scheduler.BukkitTask;
  *
  * @author zyp
  */
-public abstract class BasePlugin extends JavaPlugin implements ILogger {
+public abstract class BasePlugin extends JavaPlugin implements ILogger ,Configable{
 
     /**
      * 记录着本插件所有的类
      */
     public Map<String, Class> pluginClasses;
     private ThreadHolder taskHolder = new ThreadHolder();//线程管理器
-    private ModuleHolder moduleHolder = new ModuleHolder();//线程管理器
+    private ModuleHolder moduleHolder;//模块管理器
 
-    public void add(BukkitTask m) {
+    public final Module getModule(String name){
+        return moduleHolder.get(name);
+    }
+    
+    public final void add(BukkitTask m) {
         taskHolder.add(m);
     }
 
-    public void add(Thread m) {
+    public final void add(Thread m) {
         taskHolder.add(m);
     }
 
-    public void add(Module m) {
+    public final void add(Module m) {
         moduleHolder.add(m);
     }
 
     @Override
-    public void onDisable() {
+    public final void onDisable() {
         moduleHolder.disableAll();//先卸载模块
         taskHolder.cancelAll();//关闭线程
         onDisable0();
     }
 
     @Override
-    public void onLoad(){
+    public final void onLoad() {
         BasePluginHolder.add(this);
         initPluginClasses();//记录本插件所有类类,且所有类的静态块会被jvm调用
+        moduleHolder = new ModuleHolder(this);//线程管理器
     }
-    
+
     @Override
-    public void onEnable() {
+    public final void onEnable() {
         saveDefaultConfig();//保存配置文件
         reloadConfig();
         initBeans();//注册Bean
         registerBeans();//自动注册所有被AutoRegister注解的类
-        onEnable0();//调用子类方法
         registerModules();// 自动实例化所有模块
         moduleHolder.enableAll();//启用所有模块
+        autoRegister();//自动注册,这些没有依赖关系,所以最后注册
+        onEnable0();//调用子类方法
     }
 
     /**
      * 子类应实现重载数据
      */
     protected abstract void reloadConfig0();
+
+    private void autoRegister() {
+        BaseAPI.loopCollection(pluginClasses.values(), c -> {
+            if(c.isAnnotationPresent(AutoRegister.class)){
+                try {
+                    c.newInstance();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
 
     /**
      * 重载模块
@@ -89,8 +108,8 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger {
      */
     private void initBeans() {
         for (Class clazz : pluginClasses.values()) {
-            if (Beans.isBeans(clazz)) {
-                Beans.registerClass(clazz);
+            if (BeanUtils.isBeans(clazz)) {
+                BeanUtils.registerClass(clazz);
             }
         }
     }
@@ -163,7 +182,7 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger {
      * @return
      */
     @Override
-    public File getFile() {
+    public final File getFile() {
         return super.getFile();
     }
 
@@ -172,7 +191,7 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger {
      *
      * @return
      */
-    public ClassLoader getClassLoader_() {
+    public final ClassLoader getClassLoader_() {
         return super.getClassLoader();
     }
 }

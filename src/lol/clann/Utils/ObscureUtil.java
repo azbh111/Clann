@@ -9,6 +9,7 @@ import java.io.*;
 import java.util.*;
 import javax.xml.parsers.*;
 import lol.clann.Clann;
+import lol.clann.ClannAPI;
 import lol.clann.api.ClassApi;
 import lol.clann.object.ObscureClass;
 import org.bukkit.Bukkit;
@@ -20,8 +21,8 @@ public class ObscureUtil {
 
     private static Map<String, ObscureClass> Obscure = new HashMap();
 
-    public static void init() {
-    }
+   
+    
 
     static {
         try {
@@ -42,16 +43,16 @@ public class ObscureUtil {
                     Obscure.put(clazz.getAttributes().getNamedItem("FullName").getNodeValue().replaceAll("/", "."), new ObscureClass(clazz));
                 }
             }
-            Clann.log("混淆规则统计:");
-            Clann.log("  " + Obscure.size() + "个类");
+            ClannAPI.log("混淆规则统计:");
+            ClannAPI.log("  " + Obscure.size() + "个类");
             int fields = 0;
             int methods = 0;
             for (ObscureClass oc : Obscure.values()) {
                 fields += oc.getFieldSize();
                 methods += oc.getMethodSize();
             }
-            Clann.log("  建立" + fields + "条属性混淆规则");
-            Clann.log("  建立" + methods + "条方法混淆规则");
+            ClannAPI.log("  建立" + fields + "条属性混淆规则");
+            ClannAPI.log("  建立" + methods + "条方法混淆规则");
         } catch (Exception e) {
             e.printStackTrace();
             Bukkit.shutdown();

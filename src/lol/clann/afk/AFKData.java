@@ -9,11 +9,13 @@ import java.lang.reflect.Method;
 import lol.clann.Clann;
 import java.util.HashMap;
 import java.util.Map;
+import lol.clann.ClannAPI;
+import lol.clann.pluginbase.Module;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-public class AFKData {
+public class AFKData extends Module {
 
     /**
      * actions还可以继续优化,直接使用事件名称的hashCode,从而无需此数组
@@ -21,7 +23,7 @@ public class AFKData {
     public static final Map<String, Byte> actions = new HashMap<>();
     public final Map<String, AFKPlayer> data = new HashMap<>();
     Clann plugin;
-    
+
     static {
         byte index = 1;
         for (Method m : AFKListener.class.getDeclaredMethods()) {
@@ -35,25 +37,10 @@ public class AFKData {
             }
         }
     }
-    
-    public AFKData(Clann plugin) {
-        //初始化事件
-        this.plugin = plugin;
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            addPlayer(p);
-        }
-        BukkitTask bt = Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, new Runnable() {
-            @Override
-            public void run() {
-                synchronized (data) {
-                    for (AFKPlayer ap : data.values()) {
-                        ap.isAFK();//更新afk状态
-                        ap.refresh();//清除陈旧数据
-                    }
-                }
-            }
-        }, 20, 60 * 20);//一分钟检测一次
-        plugin.tasks.add(bt);
+    //会自动实例化
+    public AFKData() {
+        super(Clann.plugin, "AFKManager", null, null, null);
+        Clann.plugin.afkdata = this;
     }
 
     /**
@@ -68,7 +55,7 @@ public class AFKData {
         if (p != null) {
             p.logAction(action);
         } else {
-            Clann.log("玩家" + name + "未在线");
+            ClannAPI.log("玩家" + name + "未在线");
         }
     }
 
@@ -79,13 +66,13 @@ public class AFKData {
     public byte getLastAction(String name) {
         return data.get(name).getLastAction();
     }
-    
+
     public final void addPlayer(Player p) {
         synchronized (data) {
             data.put(p.getName(), new AFKPlayer(p));
         }
     }
-    
+
     public void removePlayer(Player p) {
         synchronized (data) {
             data.remove(p);
@@ -105,5 +92,31 @@ public class AFKData {
             return ap.AFK;
         }
         return true;
+    }
+
+    @Override
+    public void enable0() {
+        //初始化事件
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            addPlayer(p);
+        }
+        BukkitTask bt = Bukkit.getScheduler().runTaskTimerAsynchronously(holder, new Runnable() {
+            @Override
+            public void run() {
+                synchronized (data) {
+                    for (AFKPlayer ap : data.values()) {
+                        ap.isAFK();//更新afk状态
+                        ap.refresh();//清除陈旧数据
+                    }
+                }
+            }
+        }, 20, 60 * 20);//一分钟检测一次
+        addTask(bt);
+        
+    }
+
+    @Override
+    protected void disable0() {
+
     }
 }

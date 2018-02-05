@@ -7,6 +7,8 @@ package lol.clann.manager;
 
 import java.util.*;
 import lol.clann.Clann;
+import lol.clann.ClannAPI;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -23,7 +25,8 @@ public class ThreadManager implements Listener {
     private final static Map<String, List<BukkitTask>> taskMap = new HashMap();
 
     public ThreadManager() {
-        Clann.log("插件线程管理器已启动");
+        Bukkit.getPluginManager().registerEvents(this, Clann.plugin);
+        ClannAPI.log("插件线程管理器已启动");
     }
 
     public static void addTask(Plugin plugin, BukkitTask task) {
@@ -48,7 +51,7 @@ public class ThreadManager implements Listener {
             if (a != null && !a.isEmpty()) {
                 a.stream().forEach((b) -> {
                     b.cancel();
-                    Clann.log("终止线程(Owner:" + b.getOwner().getName() + ",TaskId:" + b.getTaskId() + ")");
+                    ClannAPI.log("终止线程(Owner:" + b.getOwner().getName() + ",TaskId:" + b.getTaskId() + ")");
                 });
             }
         }

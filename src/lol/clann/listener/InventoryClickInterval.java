@@ -6,7 +6,9 @@
 package lol.clann.listener;
 
 import java.util.*;
+import lol.clann.Clann;
 import lol.clann.api.ItemApi;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -22,6 +24,10 @@ public class InventoryClickInterval implements Listener {
 
     public static Map<String, Long> clickTime = new HashMap();
 
+    public InventoryClickInterval(){
+        Bukkit.getPluginManager().registerEvents(this, Clann.plugin);
+    }
+    
     public static void register(String title, long ms) {
         inverval.put(title, ms);
     }

@@ -5,6 +5,9 @@
  */
 package lol.clann;
 
+import lol.clann.pluginbase.Module;
+import lol.clann.pluginbase.ModuleConfiguration;
+import lol.clann.pluginbase.api.JSONData;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -13,12 +16,11 @@ import org.bukkit.entity.Player;
  *
  * @author Administrator
  */
-public class DataIO {
+public class DataIO extends Module<Clann,ModuleConfiguration,JSONData> {
 
-    Clann plugin;
-
-    public DataIO(Clann plugin) {
-        this.plugin = plugin;
+    public DataIO() {
+        super(Clann.plugin, "DataIO", null, null, null);
+        holder.data = this;
     }
 
     public boolean isAFK(Player player) {
@@ -26,17 +28,18 @@ public class DataIO {
     }
 
     public boolean isAFK(String name) {
-        return plugin.afkdata.isAFK(name);
+        return holder.afkdata.isAFK(name);
     }
 
     /**
      * 返回指定时间(600s内)内的tps
      *
      * @param second 秒数
+     *
      * @return
      */
     public float getTps(int second) {
-        return Clann.serverTick.getTps(second);
+        return holder.serverTick.getTps(second);
     }
 
     /**
@@ -45,7 +48,7 @@ public class DataIO {
      * @return
      */
     public int getTick() {
-        return Clann.serverTick.getTick();
+        return holder.serverTick.getTick();
     }
 
     public int getThreadCount() {
@@ -84,5 +87,14 @@ public class DataIO {
         }
         return count;
     }
-    
+
+    @Override
+    public void enable0() {
+      
+    }
+
+    @Override
+    protected void disable0() {
+    }
+
 }

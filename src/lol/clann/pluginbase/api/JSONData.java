@@ -52,7 +52,11 @@ public abstract class JSONData {
      */
     public final void reloadData() {
         JSONObject json = getData();
-        reloadData0(json);
+        if (json == null) {
+            initDefault();
+        } else {
+            reloadData0(json);
+        }
     }
 
     /**
@@ -62,10 +66,19 @@ public abstract class JSONData {
      */
     protected abstract void reloadData0(JSONObject json);
 
+    /**
+     * 数据文件不存在时,调用此方法
+     */
+    protected abstract void initDefault();
+
     private JSONObject getData() {
         BaseAPI.notNull(file, "数据文件不存在");
+        if (!file.exists()) {
+            return null;
+        }
         String content = FileUtils.readContent(file, encoding);
         JSONObject json = new JSONObject(content);
         return json;
     }
+
 }

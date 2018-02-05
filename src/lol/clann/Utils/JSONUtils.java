@@ -7,6 +7,7 @@ package lol.clann.Utils;
 
 import java.io.File;
 import java.nio.charset.Charset;
+import org.bukkit.craftbukkit.libs.com.google.gson.JsonParser;
 import org.json.JSONObject;
 
 /**
@@ -15,6 +16,8 @@ import org.json.JSONObject;
  */
 public class JSONUtils {
 
+    public static final JsonParser bukkitJsonParser = new JsonParser();
+    
     /**
      * 用指定编码从文件读取json
      *

@@ -5,9 +5,11 @@
  */
 package lol.clann.pluginbase;
 
+import java.io.File;
 import lol.clann.pluginbase.holder.ThreadHolder;
 import java.util.*;
 import java.util.logging.Logger;
+import lol.clann.pluginbase.api.Configable;
 import lol.clann.pluginbase.api.ILogger;
 import lol.clann.pluginbase.api.JSONData;
 import org.bukkit.scheduler.*;
@@ -16,20 +18,31 @@ import org.bukkit.scheduler.*;
  * 模块,子类只提供一个无参构造函数,在里面初始化
  *
  * @author zyp
+ * @param <T>
  */
-public abstract class Module implements ILogger {
+public abstract class Module<P extends BasePlugin,C extends ModuleConfiguration,D extends JSONData> implements ILogger,Configable {
+
+    @Override
+    public File getFile() {
+       return holder.getFile();
+    }
+
+    @Override
+    public File getDataFolder() {
+        return new File(holder.getDataFolder(),name);
+    }
 
     @Override
     public Logger getLogger() {
         return logger;
     }
 
-    protected final BasePlugin holder;
-    private final JSONData data;
+    protected final P holder;
+    private final D data;
     /**
      * 配置文件
      */
-    private final PluginConfiguration config;
+    public final C config;
 
     /**
      * 模块名称
@@ -40,7 +53,8 @@ public abstract class Module implements ILogger {
     private final ArrayList<String> depend = new ArrayList();//依赖的模块
     private boolean enable = false;
     public boolean run = true;
-    public Module(BasePlugin holder, String name, PluginConfiguration config, JSONData data, String[] depend) {
+
+    public Module(P holder, String name, C config, D data, String[] depend) {
         BaseAPI.notNull(name, "模块名字不能为空");
         BaseAPI.notNull(holder, "模块所属插件不能为空");
         this.name = name;
@@ -48,7 +62,9 @@ public abstract class Module implements ILogger {
         logger = Logger.getLogger(name);
         this.config = config;
         this.data = data;
-        this.depend.addAll(Arrays.asList(depend));
+        if (depend != null) {
+            this.depend.addAll(Arrays.asList(depend));
+        }
         this.depend.trimToSize();
     }
 
@@ -114,18 +130,18 @@ public abstract class Module implements ILogger {
         tHolder.add(t);
     }
 
-    public boolean isEnable(){
+    public boolean isEnable() {
         return enable;
     }
-    
+
     /**
      * 调用此方法加载模块
      */
-    public void enable(){
+    public void enable() {
         enable0();
         enable = true;
     }
-    
+
     public abstract void enable0();
 
     /**

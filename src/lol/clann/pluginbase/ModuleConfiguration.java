@@ -12,13 +12,13 @@ import lol.clann.pluginbase.BasePlugin;
  *
  * @author zyp
  */
-public abstract class PluginConfiguration extends BaseConfiguration {
+public abstract class ModuleConfiguration extends BaseConfiguration {
 
-    public PluginConfiguration(BasePlugin holder, String fileName) {
+    public ModuleConfiguration(BasePlugin holder, String fileName) {
         this(holder, null, fileName);
     }
 
-    public PluginConfiguration(BasePlugin holder, File folder, String fileName) {
+    public ModuleConfiguration(BasePlugin holder, String folder, String fileName) {
         super(holder, folder, fileName);
         reloadConfig();
     }

@@ -8,6 +8,7 @@ package lol.clann.api;
 import lol.clann.Clann;
 import static lol.clann.Clann.plugin;
 import lol.clann.object.Tick;
+import lol.clann.pluginbase.Module;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -16,27 +17,20 @@ import org.bukkit.scheduler.BukkitTask;
  * @author Administrator
  */
 //@AutoRegister.Register(plugin = "", type = "function")
-public class ServerTick {
+public class ServerTick extends Module {
 
     private Tick tick;
-    BukkitTask bt = null;
-
+    
     public ServerTick() {
-        tick = new Tick();
-        bt = Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
-            @Override
-            public void run() {
-                nextTick();
-            }
-        }, 20, 1);
-        Clann.plugin.tasks.add(bt);
-        Clann.serverTick = this;
+        super(Clann.plugin, "ServerTick", null, null, null);
+         Clann.serverTick = this;
     }
 
     /**
      * 计算指定时间内的平均TPS
      *
      * @param second
+     *
      * @return
      */
     public float getTps(int second) {
@@ -66,6 +60,9 @@ public class ServerTick {
      *
      * 判断是否已经doTick,如没有就等待下一tick，并在下一tick返回已执行tick数
      *
+     * @param n_tick
+     *
+     * @return
      */
     public int waitNextTick(int n_tick) {
         while (n_tick == tick.number_of_ttck) {
@@ -78,7 +75,9 @@ public class ServerTick {
      * 等待n个tick 并返回现在的tick数
      *
      * @param tick
+     *
      * @return
+     *
      * @throws InterruptedException
      */
     public int waitTicks(int n) {
@@ -87,10 +86,6 @@ public class ServerTick {
             wait(tick);
         }
         return tick.number_of_ttck;
-    }
-
-    public void cancel() {
-        bt.cancel();
     }
 
     private void wait(Object o) {
@@ -113,5 +108,22 @@ public class ServerTick {
         while (end > System.currentTimeMillis()) {
             wait(tick);
         }
+    }
+
+    @Override
+    public void enable0() {
+        tick = new Tick();
+        BukkitTask bt = Bukkit.getScheduler().runTaskTimer(plugin, new Runnable() {
+            @Override
+            public void run() {
+                nextTick();
+            }
+        }, 20, 1);
+        addTask(bt);
+    }
+
+    @Override
+    protected void disable0() {
+
     }
 }

@@ -7,13 +7,14 @@ package lol.clann;
 
 import lol.clann.object.command.CustomCommand;
 import lol.clann.object.command.SubCommandAnnotation;
+import lol.clann.pluginbase.api.AutoRegister;
 import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  *
  * @author zyp
  */
+@AutoRegister
 public class Command extends CustomCommand {
 
     public Command() {

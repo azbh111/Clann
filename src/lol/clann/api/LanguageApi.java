@@ -7,7 +7,10 @@ package lol.clann.api;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import lol.clann.Clann;
+import lol.clann.ClannAPI;
 import static lol.clann.Utils.ReflectionUtils.*;
 import lol.clann.object.Refection.MethodCondition;
 import lol.clann.object.Refection.RefClass;
@@ -22,21 +25,28 @@ import org.bukkit.inventory.ItemStack;
 public class LanguageApi {
 
     public static Map<String, String> lang = new HashMap();
-
-    public static void init() throws IOException {
+    static{
+        try {
+            init();
+            ClannAPI.log("语言映射建立完毕");
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+    private static void init() throws IOException {
         if (!Clann.plugin.mcLang_Lang.exists()) {
             me.loadMCLanguage(Clann.plugin.mcLang_Lang);
         }
         Map<String, String> mcLang = me.load(Clann.plugin.mcLang_Lang);
         Clann.lang.putAll(mcLang);
-        Clann.log("读取" + mcLang.size() + "条语言映射");
+        ClannAPI.log("读取" + mcLang.size() + "条语言映射");
         if (!Clann.plugin.modLang_Lang.exists()) {
             me.loadModLanguage(Clann.plugin.modLang_Lang);
         }
         Map<String, String> modLang = me.load(Clann.plugin.modLang_Lang);
         Clann.lang.putAll(modLang);
-        Clann.log("读取" + modLang.size() + "条语言映射");
-        Clann.log("一共" + Clann.lang.size() + "条语言映射");
+        ClannAPI.log("读取" + modLang.size() + "条语言映射");
+        ClannAPI.log("一共" + Clann.lang.size() + "条语言映射");
         me.refreshStringTranslate();
     }
 
@@ -165,8 +175,8 @@ public class LanguageApi {
             int n1 = m.size();
             m.putAll(Clann.lang);
             int n2 = m.size();
-            Clann.log("更改" + (n1 + Clann.lang.size() - n2) + "条语言映射");
-            Clann.log("添加" + (n2 - n1) + "条语言映射");
+            ClannAPI.log("更改" + (n1 + Clann.lang.size() - n2) + "条语言映射");
+            ClannAPI.log("添加" + (n2 - n1) + "条语言映射");
         }
 
         private static Map<String, String> load(File lang) throws IOException {
@@ -178,7 +188,7 @@ public class LanguageApi {
                 if (!s.startsWith("#")) {
                     String[] ss = s.split("=", 2);
                     if (ss.length != 2) {
-                        Clann.log("错误语言节点:" + s);
+                        ClannAPI.log("错误语言节点:" + s);
                         save = true;
                     } else {
                         map.put(ss[0], ss[1]);

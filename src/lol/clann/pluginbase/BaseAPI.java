@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 import lol.clann.Utils.IOUtils;
 import lol.clann.object.command.CEException;
+import lol.clann.pluginbase.api.Configable;
 
 /**
  *

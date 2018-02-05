@@ -12,6 +12,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
 import lol.clann.Clann;
+import lol.clann.ClannAPI;
+import lol.clann.pluginbase.Module;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -27,7 +29,7 @@ public class pluginDebug {
     StringWriter sw;
     PrintWriter pw;
 
-    public pluginDebug(JavaPlugin plugin)   {
+    public pluginDebug(JavaPlugin plugin) {
         try {
             this.plugin = plugin;
             File f1 = new File(System.getProperty("user.dir") + File.separator + "debuginfo" + File.separator);
@@ -41,7 +43,7 @@ public class pluginDebug {
             fw = new FileWriter(log, true);
         } catch (IOException ex) {
             ex.printStackTrace();
-            System.out.println("["+plugin.getName()+"]Debug文件建立失败");
+            ClannAPI.logError("Debug文件建立失败");
         }
     }
 
@@ -50,7 +52,7 @@ public class pluginDebug {
         pw = new PrintWriter(sw);
         e.printStackTrace(pw);
         pw.close();
-        
+
         sb = new StringBuilder();
         sb.append(Clann.dateFormate.format(new Date())).append("\n").append(sw.toString()).append("\n\n");
         String s = sb.toString();
@@ -76,4 +78,5 @@ public class pluginDebug {
             ex.printStackTrace();
         }
     }
+
 }
