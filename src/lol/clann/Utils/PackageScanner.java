@@ -18,8 +18,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import lol.clann.Clann;
 import lol.clann.api.FileApi;
+import lol.clann.pluginbase.BasePlugin;
 import org.apache.commons.lang.ClassUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -71,7 +74,7 @@ public class PackageScanner {
 
     }
 
-    private static List<String> scanJar(File f) throws IOException {
+    public static List<String> scanJar(File f) throws IOException {
         JarFile jar = new JarFile(f);
         List<String> classNameList = new LinkedList<>();
         Enumeration<JarEntry> entries = jar.entries();
@@ -115,9 +118,13 @@ public class PackageScanner {
      * @param plugin
      * @return 
      */
-    public static List<String> Scann(Plugin plugin) {
-        String pkg = plugin.getClass().getPackage().getName();
-        return Scann(pkg);
+    
+    public static List<String> Scann(BasePlugin plugin) {
+        try {
+            return scanJar(plugin.getFile());
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 //
 //    private static List<String> Scann(PackageScanner scanner) {

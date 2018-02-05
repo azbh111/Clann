@@ -19,6 +19,7 @@ import lol.clann.ClannAPI;
 import lol.clann.object.bean.BeansAnnotation;
 import lol.clann.object.bean.ComponentType;
 import lol.clann.object.bean.FieldSelector;
+import lol.clann.pluginbase.BasePlugin;
 import org.bukkit.craftbukkit.libs.com.google.gson.JsonArray;
 import org.bukkit.craftbukkit.libs.com.google.gson.JsonElement;
 import org.bukkit.craftbukkit.libs.com.google.gson.JsonObject;
@@ -46,7 +47,7 @@ public class BeanUtils {
      *
      * @param plg
      */
-    public static void registerPlugin(JavaPlugin plg) {
+    public static void registerPlugin(BasePlugin plg) {
         //注册所有Beans类
         List<String> classes = PackageScanner.Scann(plg);
         for (String s : classes) {

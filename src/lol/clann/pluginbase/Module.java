@@ -8,6 +8,7 @@ package lol.clann.pluginbase;
 import java.io.File;
 import lol.clann.pluginbase.holder.ThreadHolder;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import lol.clann.pluginbase.api.Configable;
 import lol.clann.pluginbase.api.ILogger;
@@ -20,16 +21,16 @@ import org.bukkit.scheduler.*;
  * @author zyp
  * @param <T>
  */
-public abstract class Module<P extends BasePlugin,C extends ModuleConfiguration,D extends JSONData> implements ILogger,Configable {
+public abstract class Module<P extends BasePlugin, C extends ModuleConfiguration, D extends JSONData> implements ILogger, Configable {
 
     @Override
     public File getFile() {
-       return holder.getFile();
+        return holder.getFile();
     }
 
     @Override
     public File getDataFolder() {
-        return new File(holder.getDataFolder(),name);
+        return new File(holder.getDataFolder(), name);
     }
 
     @Override
@@ -38,12 +39,13 @@ public abstract class Module<P extends BasePlugin,C extends ModuleConfiguration,
     }
 
     protected final P holder;
-    private final D data;
+    private D data = null;
     /**
      * 配置文件
      */
-    public final C config;
-
+    public C config = null;
+    private final Class<C> configClass;
+    private final Class<D> dataClass;
     /**
      * 模块名称
      */
@@ -54,14 +56,14 @@ public abstract class Module<P extends BasePlugin,C extends ModuleConfiguration,
     private boolean enable = false;
     public boolean run = true;
 
-    public Module(P holder, String name, C config, D data, String[] depend) {
+    public Module(P holder, String name, Class<C> config, Class<D> data, String[] depend) {
         BaseAPI.notNull(name, "模块名字不能为空");
         BaseAPI.notNull(holder, "模块所属插件不能为空");
         this.name = name;
         this.holder = holder;
         logger = Logger.getLogger(name);
-        this.config = config;
-        this.data = data;
+        this.configClass = config;
+        this.dataClass = data;
         if (depend != null) {
             this.depend.addAll(Arrays.asList(depend));
         }
@@ -138,8 +140,20 @@ public abstract class Module<P extends BasePlugin,C extends ModuleConfiguration,
      * 调用此方法加载模块
      */
     public void enable() {
-        enable0();
-        enable = true;
+        try {
+            if (configClass != null) {
+                config = configClass.newInstance();
+                reloadConfig();
+            }
+            if (dataClass != null) {
+                data = dataClass.newInstance();
+                reloadData();
+            }
+            enable = true;
+            enable0();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     public abstract void enable0();

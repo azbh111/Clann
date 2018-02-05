@@ -62,7 +62,7 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger ,Configab
     public final void onLoad() {
         BasePluginHolder.add(this);
         initPluginClasses();//记录本插件所有类类,且所有类的静态块会被jvm调用
-        moduleHolder = new ModuleHolder(this);//线程管理器
+        moduleHolder = new ModuleHolder(this);//模块管理器
     }
 
     @Override
@@ -70,7 +70,6 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger ,Configab
         saveDefaultConfig();//保存配置文件
         reloadConfig();
         initBeans();//注册Bean
-        registerBeans();//自动注册所有被AutoRegister注解的类
         registerModules();// 自动实例化所有模块
         moduleHolder.enableAll();//启用所有模块
         autoRegister();//自动注册,这些没有依赖关系,所以最后注册
@@ -118,6 +117,7 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger ,Configab
      * 记录本插件所有类类,且所有类的静态块会被jvm调用
      */
     private void initPluginClasses() {
+        
         List<String> list = PackageScanner.Scann(this);
         Map<String, Class> map = new HashMap();
         list.forEach((s) -> {
@@ -126,6 +126,7 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger ,Configab
                 map.put(clazz.getName(), clazz);
             } catch (ClassNotFoundException ex) {
                 ex.printStackTrace();
+                logError("类初始化失败:"+s);
             }
         });
         pluginClasses = Collections.unmodifiableMap(map);
@@ -143,24 +144,6 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger ,Configab
                 } catch (Exception e) {
                     e.printStackTrace();
                     logError("注册Module失败:" + c.getName());
-                }
-            }
-        });
-    }
-
-    /**
-     * 对含有AutoRegister注解的类进行实例化
-     *
-     * @param name
-     */
-    private void registerBeans() {
-        BaseAPI.loopCollection(pluginClasses.values(), c -> {
-            if (c.isAnnotationPresent(AutoRegister.class)) {
-                try {
-                    c.newInstance();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    logError("注册Bean失败:" + c.getName());
                 }
             }
         });

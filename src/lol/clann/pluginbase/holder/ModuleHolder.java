@@ -60,7 +60,7 @@ public class ModuleHolder {
             return re;
         }
         ArrayList<String> dp = m.getDepend();
-        if (dp.size() == 1) {
+        if (dp.size() == 0) {
             m.enable();
             plugin.log("enable module:" + m.getName());
         } else {

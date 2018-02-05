@@ -19,7 +19,7 @@ import org.json.JSONObject;
 public abstract class BeanJSONData extends JSONData {
 
     public BeanJSONData(File f) {
-        this(f, null);
+        super(f);
     }
 
     public BeanJSONData(File f, String encoding) {

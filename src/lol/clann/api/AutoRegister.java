@@ -27,54 +27,54 @@ public class AutoRegister {
      */
     private static final Set<String> classes = new HashSet();
 
-    /**
-     * 自动实例化指定插件指定类型的类
-     *
-     * @param plg 插件
-     * @param type 类型，给null时实例化默认类型
-     * @param params 参数列表
-     * @throws ClassNotFoundException
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     */
-    public static synchronized void register(Plugin plg, String type, Object... params) throws Exception {
-        if (type == null) {
-            type = "auto";
-        }
-        if (!plugins.contains(plg.getName())) {
-            classes.addAll(PackageScanner.Scann(plg));
-        }
-        List<Class> list = new LinkedList();
-        Class clazz;
-        Register anno;
-        Iterator<String> it = classes.iterator();
-        while (it.hasNext()) {
-            clazz = Class.forName(it.next());
-            anno = (Register) clazz.getAnnotation(Register.class);
-            if (anno != null && anno.plugin().equals(plg.getName()) && anno.type().equals(type)) {
-                list.add(clazz);
-            }
-        }
-        //按优先级排序
-        Collections.sort(list, new Comparator<Class>() {
-            @Override
-            public int compare(Class o1, Class o2) {
-                return ((Register) o2.getAnnotation(Register.class)).priority() - ((Register) o1.getAnnotation(Register.class)).priority();
-            }
-        });
-//        System.out.println("排序后");
-//        for (Class c : list) {
-//            System.out.println(((Register) c.getAnnotation(Register.class)).priority() + "  " + c.getName());
+//    /**
+//     * 自动实例化指定插件指定类型的类
+//     *
+//     * @param plg 插件
+//     * @param type 类型，给null时实例化默认类型
+//     * @param params 参数列表
+//     * @throws ClassNotFoundException
+//     * @throws InstantiationException
+//     * @throws IllegalAccessException
+//     */
+//    public static synchronized void register(Plugin plg, String type, Object... params) throws Exception {
+//        if (type == null) {
+//            type = "auto";
 //        }
-        //初始化
-        for (Class c : list) {
-            if (params != null && params.length > 0) {
-                c.getDeclaredConstructor(ClassApi.warpClasses(params)).newInstance(params);
-            } else {
-                c.newInstance();
-            }
-        }
-    }
+//        if (!plugins.contains(plg.getName())) {
+//            classes.addAll(PackageScanner.Scann(plg.));
+//        }
+//        List<Class> list = new LinkedList();
+//        Class clazz;
+//        Register anno;
+//        Iterator<String> it = classes.iterator();
+//        while (it.hasNext()) {
+//            clazz = Class.forName(it.next());
+//            anno = (Register) clazz.getAnnotation(Register.class);
+//            if (anno != null && anno.plugin().equals(plg.getName()) && anno.type().equals(type)) {
+//                list.add(clazz);
+//            }
+//        }
+//        //按优先级排序
+//        Collections.sort(list, new Comparator<Class>() {
+//            @Override
+//            public int compare(Class o1, Class o2) {
+//                return ((Register) o2.getAnnotation(Register.class)).priority() - ((Register) o1.getAnnotation(Register.class)).priority();
+//            }
+//        });
+////        System.out.println("排序后");
+////        for (Class c : list) {
+////            System.out.println(((Register) c.getAnnotation(Register.class)).priority() + "  " + c.getName());
+////        }
+//        //初始化
+//        for (Class c : list) {
+//            if (params != null && params.length > 0) {
+//                c.getDeclaredConstructor(ClassApi.warpClasses(params)).newInstance(params);
+//            } else {
+//                c.newInstance();
+//            }
+//        }
+//    }
 
     @Target(ElementType.TYPE)
     @Retention(RetentionPolicy.RUNTIME)
