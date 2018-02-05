@@ -27,19 +27,6 @@ public class SqlServer {
     private Statement s;
     private final File dir;
 
-//    public static void main(String args[]) throws Exception {
-//        String url = "jdbc:sqlserver://" + "127.0.0.1" + ":" + 1433 + ";databaseName=";
-//        Connection conn = DriverManager.getConnection(url, "sa", "sqlserver597667");
-//        Statement state = conn.createStatement();
-//        state.execute("use LogAll");
-//        ResultSet rs = state.executeQuery("select * from Teleport");
-//        while (rs.next()) {
-//            System.out.println(rs.getInt(2));
-//        }
-//        rs.close();
-//        state.close();
-//        conn.close();
-//    }
     public SqlServer(JavaPlugin plugin, File dir, String database, String address, String user, String pwd) {
         this.plugin = plugin;
         this.dir = dir;

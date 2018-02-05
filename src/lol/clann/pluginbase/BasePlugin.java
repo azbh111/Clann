@@ -53,9 +53,9 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger ,Configab
 
     @Override
     public final void onDisable() {
+        onDisable0();
         moduleHolder.disableAll();//先卸载模块
         taskHolder.cancelAll();//关闭线程
-        onDisable0();
     }
 
     @Override
@@ -71,9 +71,9 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger ,Configab
         reloadConfig();
         initBeans();//注册Bean
         registerModules();// 自动实例化所有模块
+        onEnable0();//调用子类方法
         moduleHolder.enableAll();//启用所有模块
         autoRegister();//自动注册,这些没有依赖关系,所以最后注册
-        onEnable0();//调用子类方法
     }
 
     /**
