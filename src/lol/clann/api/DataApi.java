@@ -40,6 +40,7 @@ public class DataApi {
     }
     
     /**
+     * AES加密
      * @param password 加密密码
      * @return
      */
@@ -57,7 +58,7 @@ public class DataApi {
     }
 
     /**
-     * 解密
+     * AES解密
      *
      * @param content 待解密内容
      * @param password 解密密钥

@@ -85,6 +85,9 @@ public class ClassApi {
     /**
      * 显示一个类的所有信息
      *
+     * @param name
+     * @param sort
+     * @return 
      */
     public static List<String> showClassInfo(String name, boolean sort) {
         List<String> info = new ArrayList<>();
