@@ -13,7 +13,7 @@ import org.json.JSONObject;
  *
  * @author zyp
  */
-public class JsonHelper {
+public class JSONUtils {
 
     /**
      * 用指定编码从文件读取json

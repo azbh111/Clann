@@ -99,6 +99,7 @@ public class FileUtils {
      */
     public static void writeData(File f, boolean append, byte[] data) {
         try {
+            f = getFile(f.getPath(),true);//创建文件
             OutputStream os = new FileOutputStream(f, append);
             ByteArrayInputStream in = new ByteArrayInputStream(data);
             IOUtils.transform(in, os);

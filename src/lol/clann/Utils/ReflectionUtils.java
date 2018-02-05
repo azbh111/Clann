@@ -2,6 +2,7 @@ package lol.clann.Utils;
 
 import org.bukkit.Bukkit;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 import lol.clann.object.Refection.RefClass;
 import lol.clann.object.Refection.RefField;
@@ -73,6 +74,20 @@ public class ReflectionUtils {
      * @throws RuntimeException if no class found
      */
 
+    /**
+     * 判断类中是否有不是继承的指定名字的方法
+     * @param clazz
+     * @param name
+     * @return 
+     */
+    public static boolean methodExist(Class clazz,String name){
+        for(Method m:clazz.getDeclaredMethods()){
+            if(m.getName().equals(name)){
+                return true;
+            }
+        }
+        return false;
+    }
     
     public static RefClass getRefClass(String pattern) {
         String[] vars;

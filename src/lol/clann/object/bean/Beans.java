@@ -10,6 +10,7 @@ import java.util.*;
 import lol.clann.Clann;
 import lol.clann.Utils.PackageScanner;
 import org.bukkit.craftbukkit.libs.com.google.gson.*;
+import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * 只允许基本数据类型、String和以上类型的数组
@@ -39,7 +40,26 @@ public abstract class Beans {
         }
         registerPackage("lol.clann.beans");
     }
-
+    /**
+     * 注册插件jar包里的bean
+     * @param plg 
+     */
+    public static void registerPlugin(JavaPlugin plg){
+       //注册所有Beans类
+        List<String> classes = PackageScanner.Scann(plg);
+        for (String s : classes) {
+            try {
+                Class clazz = Class.forName(s);
+                if (clazz.isAnnotationPresent(BeansAnnotation.class)) {
+                    registerClass(clazz);
+                    Clann.logError("注册Bean失败:" + clazz.getName());
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
     /**
      * 注册指定包下的Bean类
      *
@@ -52,8 +72,8 @@ public abstract class Beans {
             try {
                 Class clazz = Class.forName(s);
                 if (clazz.isAnnotationPresent(BeansAnnotation.class)) {
-                    registerBeans(clazz);
-                    Clann.logError("注册Bean:" + clazz.getName());
+                    registerClass(clazz);
+                    Clann.logError("注册Bean失败:" + clazz.getName());
                 }
             } catch (Throwable e) {
                 e.printStackTrace();
@@ -61,7 +81,7 @@ public abstract class Beans {
         }
     }
 
-    private static void registerBeans(Class clazz) {
+    public static void registerClass(Class clazz) {
         Map<String, Field> fs = new HashMap();
         classFields.put(clazz, fs);
         //加载属性

@@ -20,6 +20,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import lol.clann.Clann;
 import lol.clann.api.FileApi;
+import org.apache.commons.lang.ClassUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -109,7 +110,11 @@ public class PackageScanner {
         }
         return re;
     }
-
+    /**
+     *  扫描插件的所有类
+     * @param plugin
+     * @return 
+     */
     public static List<String> Scann(Plugin plugin) {
         String pkg = plugin.getClass().getPackage().getName();
         return Scann(pkg);
