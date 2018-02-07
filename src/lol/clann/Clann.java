@@ -4,16 +4,13 @@ import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import lol.clann.Utils.ObscureUtil;
 import lol.clann.afk.AFKData;
+import lol.clann.afk.AFKListener;
 import lol.clann.api.*;
 import lol.clann.listener.InventoryClickInterval;
-import lol.clann.afk.AFKListener;
 import lol.clann.manager.ThreadManager;
 import lol.clann.pluginbase.BasePlugin;
-import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.RegisteredServiceProvider;
 
 public class Clann extends BasePlugin {
 
@@ -42,26 +39,26 @@ public class Clann extends BasePlugin {
         new InventoryClickInterval();
         new ThreadManager();
     }
-
-    public static Permission getPermission() {
-        return perm;
-    }
-
-    private static Permission perm = null;
-
-    private boolean setupPermissions() {
-        try {
-            Class permClass = Class.forName("net.milkbowl.vault.permission.Permission");
-            RegisteredServiceProvider permissionProvider = getServer().getServicesManager().getRegistration(permClass);
-            if (permissionProvider != null) {
-                perm = (Permission) permissionProvider.getProvider();
-            }
-            return (perm != null);
-        } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
-            return false;
-        }
-    }
+//
+//    public static Permission getPermission() {
+//        return perm;
+//    }
+//
+//    private static Permission perm = null;
+//
+//    private boolean setupPermissions() {
+//        try {
+//            Class permClass = Class.forName("net.milkbowl.vault.permission.Permission");
+//            RegisteredServiceProvider permissionProvider = getServer().getServicesManager().getRegistration(permClass);
+//            if (permissionProvider != null) {
+//                perm = (Permission) permissionProvider.getProvider();
+//            }
+//            return (perm != null);
+//        } catch (ClassNotFoundException ex) {
+//            ex.printStackTrace();
+//            return false;
+//        }
+//    }
 
     @Override
     protected void reloadConfig0() {
@@ -79,11 +76,11 @@ public class Clann extends BasePlugin {
     @Override
     public void onEnable0() {
         try {
-            if (!setupPermissions()) {
-                log("权限系统加载失败");
-                Bukkit.shutdown();
-                return;
-            }
+//            if (!setupPermissions()) {
+//                log("权限系统加载失败");
+//                Bukkit.shutdown();
+//                return;
+//            }
 //            saveDefaultConfig();
 //            ObscureUtil.init();
 //            ReflectApi.init();
