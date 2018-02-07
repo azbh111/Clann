@@ -5,12 +5,15 @@
  */
 package lol.clann.Utils;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -29,6 +32,16 @@ import lol.clann.api.FileApi;
  */
 public class FileUtils {
 
+    public static void main(String[] args) throws Exception{
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File("C:\\Users\\zyp\\Desktop\\新建文本文档.txt"))));
+        String s = "";
+        String ss;
+        while((ss = br.readLine())!=null){
+            s += ss;
+        }
+        System.out.println(s);
+    }
+    
     /**
      * 根据uuid返回路径,层数与长度之积应不大于32
      *

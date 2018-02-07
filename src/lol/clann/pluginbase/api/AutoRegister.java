@@ -18,4 +18,9 @@ import java.lang.annotation.Target;
 @Target(value = {ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface AutoRegister {
+    /**
+     * 优先级,越大越先注册
+     * @return 
+     */
+    int priority() default 0;
 }

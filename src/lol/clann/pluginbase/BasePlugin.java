@@ -5,18 +5,22 @@
  */
 package lol.clann.pluginbase;
 
-import lol.clann.pluginbase.holder.BasePluginHolder;
 import java.io.*;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lol.clann.Utils.BeanUtils;
 import lol.clann.Utils.PackageScanner;
 import lol.clann.pluginbase.api.AutoRegister;
 import lol.clann.pluginbase.api.Configable;
 import lol.clann.pluginbase.api.ILogger;
+import lol.clann.pluginbase.holder.BasePluginHolder;
 import lol.clann.pluginbase.holder.ModuleHolder;
 import lol.clann.pluginbase.holder.ThreadHolder;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -26,7 +30,7 @@ import org.bukkit.scheduler.BukkitTask;
  *
  * @author zyp
  */
-public abstract class BasePlugin extends JavaPlugin implements ILogger ,Configable{
+public abstract class BasePlugin extends JavaPlugin implements ILogger, Configable {
 
     /**
      * 记录着本插件所有的类
@@ -35,10 +39,10 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger ,Configab
     private ThreadHolder taskHolder = new ThreadHolder();//线程管理器
     private ModuleHolder moduleHolder;//模块管理器
 
-    public final Module getModule(String name){
+    public final Module getModule(String name) {
         return moduleHolder.get(name);
     }
-    
+
     public final void add(BukkitTask m) {
         taskHolder.add(m);
     }
@@ -82,14 +86,32 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger ,Configab
     protected abstract void reloadConfig0();
 
     private void autoRegister() {
-        BaseAPI.loopCollection(pluginClasses.values(), c -> {
-            if(c.isAnnotationPresent(AutoRegister.class)){
-                try {
-                    c.newInstance();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
+        LinkedHashMap<Class, Integer> notRegister = new LinkedHashMap();  //待住的的类
+        BaseAPI.loopCollection(pluginClasses.values(), c -> {   //选出待实例的类
+            if (c.isAnnotationPresent(AutoRegister.class)) {
+                AutoRegister r = (AutoRegister) c.getAnnotation(AutoRegister.class);
+                notRegister.put(c, r.priority());
             }
+        });
+        //按优先级降序排列
+        Set<Map.Entry<Class, Integer>> set = notRegister.entrySet();
+        List<Map.Entry<Class, Integer>> list = new ArrayList();
+        list.addAll(set);
+        list.sort(new Comparator<Map.Entry<Class, Integer>>() {
+            @Override
+            public int compare(Map.Entry<Class, Integer> o1, Map.Entry<Class, Integer> o2) {
+                return o2.getValue() - o1.getValue();
+            }
+        });
+        //注册
+        BaseAPI.loopCollection(list, en ->{
+            try {
+                en.getKey().newInstance();
+                log("注册:"+en.getKey().getName());
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                logError("类"+en.getKey().getName()+"实例化失败");
+            } 
         });
     }
 
@@ -117,7 +139,6 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger ,Configab
      * 记录本插件所有类类,且所有类的静态块会被jvm调用
      */
     private void initPluginClasses() {
-        
         List<String> list = PackageScanner.Scann(this);
         Map<String, Class> map = new HashMap();
         list.forEach((s) -> {
@@ -126,7 +147,7 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger ,Configab
                 map.put(clazz.getName(), clazz);
             } catch (ClassNotFoundException ex) {
                 ex.printStackTrace();
-                logError("类初始化失败:"+s);
+                logError("类初始化失败:" + s);
             }
         });
         pluginClasses = Collections.unmodifiableMap(map);
