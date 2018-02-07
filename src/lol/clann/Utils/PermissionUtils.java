@@ -7,6 +7,7 @@ package lol.clann.Utils;
 
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
 /**
@@ -22,28 +23,48 @@ public class PermissionUtils {
 
     /**
      * 判断玩家是否有指定权限
+     *
      * @param player
      * @param perm
-     * @return 
+     *
+     * @return
      */
-    public static boolean hasPermission(Player player, String perm) {
+    public static boolean hasPermission(OfflinePlayer player, String perm) {
         return hasPermission(null, player.getName(), perm);
     }
+
     /**
      * 判断玩家是否有指定权限
+     *
      * @param player
      * @param perm
-     * @return 
+     *
+     * @return
+     */
+    public static boolean hasPermission(Player player, String perm) {
+        return hasPermission(player.getWorld().getName(), player.getName(), perm);
+    }
+
+    /**
+     * 判断玩家是否有指定权限
+     *
+     * @param player
+     * @param perm
+     *
+     * @return
      */
     public static boolean hasPermission(String player, String perm) {
         return hasPermission(null, player, perm);
     }
+
     /**
      * 判断玩家是否有指定权限
+     *
      * @param world
      * @param player
      * @param perm
-     * @return 
+     *
+     * @return
      */
     public static boolean hasPermission(String world, String player, String perm) {
         return permission.playerHas(world, player, perm);
