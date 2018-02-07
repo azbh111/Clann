@@ -12,7 +12,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitTask;
 
-
 /**
  * 提供一个接口,让异步线程的指令在主线程里执行
  *
@@ -40,6 +39,7 @@ public class CommandUtils {
             }
         }, 1, 1);
         Clann.plugin.add(bt);
+        Clann.plugin.log("异步线程执行同步指令辅助功能启动");
     }
 
     /**
