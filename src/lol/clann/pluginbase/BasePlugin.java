@@ -65,13 +65,13 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger, Configab
     @Override
     public final void onLoad() {
         BasePluginHolder.add(this);
-        initPluginClasses();//记录本插件所有类类,且所有类的静态块会被jvm调用
         moduleHolder = new ModuleHolder(this);//模块管理器
     }
 
     @Override
     public final void onEnable() {
         saveDefaultConfig();//保存配置文件
+        initPluginClasses();//记录本插件所有类类,且所有类的静态块会被jvm调用
         reloadConfig();
         initBeans();//注册Bean
         registerModules();// 自动实例化所有模块
