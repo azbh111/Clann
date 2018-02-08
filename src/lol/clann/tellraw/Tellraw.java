@@ -7,7 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lol.clann.Utils.StringUtil;
 import lol.clann.api.CollectionsApi;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -168,6 +167,7 @@ public class Tellraw implements Cloneable {
      * 添加一段字符串到现有的Tellraw中
      *
      * @param pText 字符串
+     *
      * @return 自身
      */
     public Tellraw addText(String pText) {
@@ -185,6 +185,7 @@ public class Tellraw implements Cloneable {
      * </p>
      *
      * @param pText 文件
+     *
      * @return 本身
      */
     public Tellraw addRawText(String pText) {
