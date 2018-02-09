@@ -24,7 +24,6 @@ import org.bukkit.craftbukkit.libs.com.google.gson.JsonArray;
 import org.bukkit.craftbukkit.libs.com.google.gson.JsonElement;
 import org.bukkit.craftbukkit.libs.com.google.gson.JsonObject;
 import org.bukkit.craftbukkit.libs.com.google.gson.JsonPrimitive;
-import org.bukkit.plugin.java.JavaPlugin;
 import org.json.JSONObject;
 
 /**

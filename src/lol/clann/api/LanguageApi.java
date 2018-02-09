@@ -7,8 +7,6 @@ package lol.clann.api;
 
 import java.io.*;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import lol.clann.Clann;
 import lol.clann.ClannAPI;
 import static lol.clann.Utils.ReflectionUtils.*;
@@ -33,6 +31,7 @@ public class LanguageApi {
             throw new RuntimeException(ex);
         }
     }
+    
     private static void init() throws IOException {
         if (!Clann.plugin.mcLang_Lang.exists()) {
             me.loadMCLanguage(Clann.plugin.mcLang_Lang);
