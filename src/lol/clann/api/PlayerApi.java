@@ -14,6 +14,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.PlayerInventory;
 
 /**
  *
@@ -24,6 +25,24 @@ public class PlayerApi {
     static Object server = ReflectApi.CraftServer_getServer.of(Bukkit.getServer()).call();
     static Object world = ReflectApi.MinecraftServer_getWorldServer.of(server).call(0);
     static Object ItemInWorldManager = ReflectApi.newItemInWorldManager.create(world);
+
+    /**
+     * 计算玩家背包空格子数量
+     *
+     * @param p
+     *
+     * @return
+     */
+    public static int getInventoryEmpySlotCount(Player p) {
+        PlayerInventory inv = p.getInventory();
+        int n = 0;
+        for (int i = 0; i < inv.getSize(); i++) {
+            if (ItemApi.isEmpty(inv.getItem(i))) {
+                n++;
+            }
+        }
+        return n;
+    }
 
     public static void updateHeldItemSlot(Player p) {
         p.getInventory().setHeldItemSlot(p.getInventory().getHeldItemSlot());

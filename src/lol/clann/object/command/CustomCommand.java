@@ -16,7 +16,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 /**
  * 样例
  * 方法名为指令的第一个参数,/op example
- *
  * @SubCommandAnnotation(
  * mustPlayer = true, //是否必须玩家才能执行,可省,默认false
  * needOp = false, //是否必须有OP权限(控制台也有)才能执行,可省,默认true
@@ -28,8 +27,6 @@ import org.bukkit.plugin.java.JavaPlugin;
  * public void example(CommandSender sender, String[] args) {
  *  //args包含输入指令的第二个参数到结尾的所有参数
  * }
- *
- *
  */
 public abstract class CustomCommand implements CommandExecutor {
 

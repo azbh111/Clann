@@ -235,4 +235,5 @@ public class StringUtil extends org.apache.commons.lang.StringUtils {
         }
         return buf.toString();
     }
+
 }

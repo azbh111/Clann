@@ -7,15 +7,18 @@ package lol.clann.api;
 
 import java.io.*;
 import java.util.*;
+import lol.clann.Clann;
+import lol.clann.Utils.FileUtils;
 import lol.clann.Utils.StringUtil;
 import lol.clann.exception.*;
+import lol.clann.object.command.CEException;
 import lol.clann.object.nbt.*;
+import lol.clann.tellraw.*;
 import org.bukkit.*;
+import org.bukkit.enchantments.*;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.*;
 import org.bukkit.plugin.java.JavaPlugin;
-import lol.clann.tellraw.*;
-import org.bukkit.enchantments.*;
 
 /**
  *
@@ -54,6 +57,7 @@ public class ItemApi {
      *
      * @param item
      * @param tag
+     *
      * @return
      */
     public static ItemStack removeTag(ItemStack is, String[] roots) {
@@ -78,6 +82,7 @@ public class ItemApi {
      * 源自BossShopRe
      *
      * @param o
+     *
      * @return
      */
     private static String getNBTFormatJson(Object o) {
@@ -141,6 +146,7 @@ public class ItemApi {
      * 源自BossShopRe
      *
      * @param pItem
+     *
      * @return
      */
     private static String getItemJson(ItemStack pItem) {
@@ -182,6 +188,7 @@ public class ItemApi {
      * ItemStack保存为NBTTagCompound
      *
      * @param is
+     *
      * @return
      */
     public static NBTTagCompound ItemStack2NBTTagCompound(ItemStack is) {
@@ -195,6 +202,7 @@ public class ItemApi {
      * 由NBTTagCompound生成ItemStack
      *
      * @param tag
+     *
      * @return
      */
     public static ItemStack NBTTagCompound2ItemStack(NBTTagCompound tag) {
@@ -211,6 +219,7 @@ public class ItemApi {
      * 判断物品是否为空(null air)
      *
      * @param is
+     *
      * @return
      */
     public static boolean isEmpty(ItemStack is) {
@@ -225,6 +234,7 @@ public class ItemApi {
      *
      * @param is
      * @param name
+     *
      * @return
      */
     public static ItemStack setName(ItemStack is, String name) {
@@ -238,6 +248,7 @@ public class ItemApi {
      * 返回非空Lore
      *
      * @param is
+     *
      * @return
      */
     public static List<String> getLore(ItemStack is) {
@@ -257,6 +268,7 @@ public class ItemApi {
      *
      * @param is
      * @param s
+     *
      * @return
      */
     public static ItemStack setLore(ItemStack is, List<String> lore) {
@@ -292,6 +304,7 @@ public class ItemApi {
      *
      * @param is
      * @param s
+     *
      * @return
      */
     public static ItemStack setLore(ItemStack is, int index, String add) {
@@ -306,6 +319,7 @@ public class ItemApi {
      *
      * @param is
      * @param s
+     *
      * @return
      */
     public static ItemStack addLore(ItemStack is, String s) {
@@ -318,6 +332,7 @@ public class ItemApi {
      * 移除物品所有Lore
      *
      * @param item
+     *
      * @return
      */
     public static ItemStack removeLore(ItemStack is) {
@@ -329,6 +344,7 @@ public class ItemApi {
      *
      * @param item
      * @param i
+     *
      * @return
      */
     public static ItemStack removeLore(ItemStack is, int i) {
@@ -362,6 +378,7 @@ public class ItemApi {
      * 设置物品不掉耐久
      *
      * @param item
+     *
      * @return
      */
     public static ItemStack setUnbreakable(ItemStack is, boolean Unbreakable) {
@@ -387,6 +404,7 @@ public class ItemApi {
      * @param item
      * @param type
      * @param amount
+     *
      * @return
      */
     public static ItemStack addAttribute(ItemStack item, String type, double amount) {
@@ -429,6 +447,7 @@ public class ItemApi {
      *
      * @param plg
      * @param key
+     *
      * @return
      */
     public static ItemStack getItem(JavaPlugin plg, String key) {
@@ -452,6 +471,15 @@ public class ItemApi {
             }
         }
     }
+    /**
+     * 以键值key保存ItemStack[]
+     * @param key
+     * @param iss
+     * @throws IOException 
+     */
+    public static void saveItemStacks(String key, ItemStack[] iss) throws IOException {
+        saveItemStacks(Clann.plugin, key, iss);
+    }
 
     /**
      * 以键值key保存ItemStack[]
@@ -459,9 +487,10 @@ public class ItemApi {
      * @param plg
      * @param key
      * @param iss 可以含null，会自动过滤
+     *
+     * @throws java.io.IOException
      */
     public static void saveItemStacks(JavaPlugin plg, String key, ItemStack[] iss) throws IOException {
-        DataOutputStream out = null;
         try {
             NBTTagCompound tag = new NBTTagCompound();
             NBTTagList items = new NBTTagList();
@@ -471,17 +500,20 @@ public class ItemApi {
                 }
             }
             tag.put("items", items);
-            File file = FileApi.createFile(plg.getDataFolder() + File.separator + "Inventory" + File.separator + key);
+            File file = FileUtils.getFile(plg.getDataFolder().getPath() + File.separator + "Inventory" + File.separator + key, true);
             tag.writeGZip(new FileOutputStream(file, false));
         } catch (IOException ex) {
             throw ex;
-        } finally {
-            try {
-                DataApi.close(out);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
         }
+    }
+    /**
+     * 从键值key读取ItemStack[]
+     * @param key
+     * @param iss
+     * @throws IOException 
+     */
+    public static ItemStack[] getItemStacks(String key) throws IOException {
+        return getItemStacks(Clann.plugin, key);
     }
 
     /**
@@ -489,18 +521,16 @@ public class ItemApi {
      *
      * @param plg
      * @param key
+     *
      * @return
      */
     public static ItemStack[] getItemStacks(JavaPlugin plg, String key) throws IOException {
-        FileInputStream in = null;
         try {
             File file = new File(plg.getDataFolder() + File.separator + "Inventory" + File.separator + key);
             if (!file.exists()) {
-                //System.out.println("物品不存在");
-                return null;
+                throw new CEException("文件不存在:" + file.getPath());
             }
-            in = new FileInputStream(file);
-            NBTTagList items = NBTTagCompound.readGZip(in).getList("items");
+            NBTTagList items = NBTTagCompound.readGZip(file).getList("items");
             ItemStack[] iss = new ItemStack[items.size()];
             for (int i = 0; i < items.size(); i++) {
                 iss[i] = NBTTagCompound2ItemStack(items.getCompound(i));
@@ -508,12 +538,6 @@ public class ItemApi {
             return iss;
         } catch (IOException ex) {
             throw ex;
-        } finally {
-            try {
-                DataApi.close(in);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
         }
     }
 
@@ -569,6 +593,7 @@ public class ItemApi {
          * @param item
          * @param type
          * @param amount
+         *
          * @return
          */
         private static ItemStack addAttributeModifiers(ItemStack item, String type, double amount) {
@@ -626,7 +651,9 @@ public class ItemApi {
          * @param itemstack
          * @param enchType
          * @param level
+         *
          * @return
+         *
          * @throws Exception
          */
         private static ItemStack addEnchantment(ItemStack is, Enchantment en, short level) {
@@ -655,7 +682,9 @@ public class ItemApi {
          * @param itemstack
          * @param enchType
          * @param level
+         *
          * @return
+         *
          * @throws Exception
          */
         private static ItemStack setEnchantment(ItemStack is, int index, Enchantment en, short level) {
@@ -690,7 +719,9 @@ public class ItemApi {
          * @param itemstack
          * @param enchType
          * @param level
+         *
          * @return
+         *
          * @throws Exception
          */
         private static ItemStack removeEnchantment(ItemStack is, int index) {
@@ -714,6 +745,7 @@ public class ItemApi {
          * 移除物品所有附魔
          *
          * @param is
+         *
          * @return
          */
         private static ItemStack removeEnchantments(ItemStack is) {
@@ -733,6 +765,7 @@ public class ItemApi {
          * 移除物品所有属性
          *
          * @param is
+         *
          * @return
          */
         private static ItemStack removeAttributes(ItemStack is) {
@@ -750,6 +783,7 @@ public class ItemApi {
          * 移除物品指定属性
          *
          * @param is
+         *
          * @return
          */
         private static ItemStack removeAttribute(ItemStack is, String name) {

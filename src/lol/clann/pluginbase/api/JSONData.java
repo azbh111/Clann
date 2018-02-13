@@ -7,7 +7,6 @@ package lol.clann.pluginbase.api;
 
 import java.io.*;
 import java.nio.charset.Charset;
-import lol.clann.pluginbase.BaseAPI;
 import lol.clann.Utils.FileUtils;
 import lol.clann.Utils.JSONUtils;
 import org.json.JSONObject;
@@ -72,7 +71,6 @@ public abstract class JSONData {
     protected abstract void initDefault();
 
     private JSONObject getData() {
-        BaseAPI.notNull(file, "数据文件不存在");
         if (!file.exists()) {
             return null;
         }
