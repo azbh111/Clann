@@ -419,26 +419,11 @@ public class ItemApi {
      * @param is
      */
     public static void saveItem(JavaPlugin plg, String key, ItemStack is) {
-        FileOutputStream fos = null;
         try {
-            File file = new File(plg.getDataFolder() + File.separator + "Item" + File.separator + key);
-            if (!file.exists()) {
-                File dir = file.getParentFile();
-                if (!dir.exists()) {
-                    dir.mkdirs();
-                }
-                file.createNewFile();
-            }
-            fos = new FileOutputStream(file, false);
-            ItemStack2NBTTagCompound(is).writeGZip(fos);
+            File file = FileUtils.getFolder(plg.getDataFolder().getPath() + File.separator + "Item" + File.separator + key, true);
+            ItemStack2NBTTagCompound(is).writeGZip(file);
         } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            try {
-                DataApi.close(fos);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            throw new CEException(ex);
         }
     }
 
@@ -451,33 +436,26 @@ public class ItemApi {
      * @return
      */
     public static ItemStack getItem(JavaPlugin plg, String key) {
-        FileInputStream fis = null;
         try {
             File file = new File(plg.getDataFolder() + File.separator + "Item" + File.separator + key);
             if (!file.exists()) {
-                //System.out.println("物品不存在");
-                return null;
+                throw new CEException("物品不存在");
             }
-            fis = new FileInputStream(file);
-            return NBTTagCompound2ItemStack(NBTTagCompound.readGZip(fis));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
-        } finally {
-            try {
-                DataApi.close(fis);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
+            return NBTTagCompound2ItemStack(NBTTagCompound.readGZip(file));
+        } catch (IOException ex) {
+            throw new CEException(ex);
         }
     }
+
     /**
      * 以键值key保存ItemStack[]
+     *
      * @param key
      * @param iss
-     * @throws IOException 
+     *
+     * @throws IOException
      */
-    public static void saveItemStacks(String key, ItemStack[] iss) throws IOException {
+    public static void saveItemStacks(String key, ItemStack[] iss) {
         saveItemStacks(Clann.plugin, key, iss);
     }
 
@@ -487,10 +465,8 @@ public class ItemApi {
      * @param plg
      * @param key
      * @param iss 可以含null，会自动过滤
-     *
-     * @throws java.io.IOException
      */
-    public static void saveItemStacks(JavaPlugin plg, String key, ItemStack[] iss) throws IOException {
+    public static void saveItemStacks(JavaPlugin plg, String key, ItemStack[] iss) {
         try {
             NBTTagCompound tag = new NBTTagCompound();
             NBTTagList items = new NBTTagList();
@@ -503,16 +479,21 @@ public class ItemApi {
             File file = FileUtils.getFile(plg.getDataFolder().getPath() + File.separator + "Inventory" + File.separator + key, true);
             tag.writeGZip(new FileOutputStream(file, false));
         } catch (IOException ex) {
-            throw ex;
+            throw new CEException(ex);
         }
     }
+
     /**
      * 从键值key读取ItemStack[]
+     *
      * @param key
      * @param iss
-     * @throws IOException 
+     *
+     * @return
+     *
+     * @throws IOException
      */
-    public static ItemStack[] getItemStacks(String key) throws IOException {
+    public static ItemStack[] getItemStacks(String key) {
         return getItemStacks(Clann.plugin, key);
     }
 
@@ -524,7 +505,7 @@ public class ItemApi {
      *
      * @return
      */
-    public static ItemStack[] getItemStacks(JavaPlugin plg, String key) throws IOException {
+    public static ItemStack[] getItemStacks(JavaPlugin plg, String key) {
         try {
             File file = new File(plg.getDataFolder() + File.separator + "Inventory" + File.separator + key);
             if (!file.exists()) {
@@ -537,7 +518,7 @@ public class ItemApi {
             }
             return iss;
         } catch (IOException ex) {
-            throw ex;
+            throw new CEException(ex);
         }
     }
 
