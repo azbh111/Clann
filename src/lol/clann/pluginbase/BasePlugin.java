@@ -6,6 +6,7 @@
 package lol.clann.pluginbase;
 
 import java.io.*;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +39,36 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger, Configab
     public Map<String, Class> pluginClasses;
     private ThreadHolder taskHolder = new ThreadHolder();//线程管理器
     private ModuleHolder moduleHolder;//模块管理器
+
+    public BasePlugin() {
+        setPlugin();//自动设置plugin属性
+    }
+
+    private void setPlugin() {
+        Field plugin;
+        try {
+            plugin = getClass().getDeclaredField("plugin");
+        } catch (NoSuchFieldException | SecurityException e) {
+            log("pass...不含plugin属性");
+            return;
+        }
+        plugin.setAccessible(true);
+        if (plugin.getType() == getClass()) {
+            try {
+                if (Modifier.isStatic(plugin.getModifiers())) {
+                    //静态
+                    plugin.set(null, this);
+                } else {
+                    plugin.set(this, this);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                logWarning("设置plugin属性失败");
+            }
+        } else {
+            logWarning("pass...plugin不是类" + getClass().getName() + "的实例");
+        }
+    }
 
     public final Module getModule(String name) {
         return moduleHolder.get(name);
@@ -104,14 +135,14 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger, Configab
             }
         });
         //注册
-        BaseAPI.loopCollection(list, en ->{
+        BaseAPI.loopCollection(list, en -> {
             try {
                 en.getKey().newInstance();
-                log("注册:"+en.getKey().getName());
+                log("注册:" + en.getKey().getName());
             } catch (Exception ex) {
                 ex.printStackTrace();
-                logError("类"+en.getKey().getName()+"实例化失败");
-            } 
+                logError("类" + en.getKey().getName() + "实例化失败");
+            }
         });
     }
 
