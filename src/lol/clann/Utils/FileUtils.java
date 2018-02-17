@@ -6,6 +6,7 @@
 package lol.clann.Utils;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -15,8 +16,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -25,6 +29,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 import lol.clann.api.FileApi;
+import lol.clann.object.command.CEException;
 
 /**
  *
@@ -32,16 +37,16 @@ import lol.clann.api.FileApi;
  */
 public class FileUtils {
 
-    public static void main(String[] args) throws Exception{
+    public static void main(String[] args) throws Exception {
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(new File("C:\\Users\\zyp\\Desktop\\新建文本文档.txt"))));
         String s = "";
         String ss;
-        while((ss = br.readLine())!=null){
+        while ((ss = br.readLine()) != null) {
             s += ss;
         }
         System.out.println(s);
     }
-    
+
     /**
      * 根据uuid返回路径,层数与长度之积应不大于32
      *
@@ -69,7 +74,8 @@ public class FileUtils {
      *
      * @param folder
      * @param uuid
-     * @return 
+     *
+     * @return
      */
     public static File getFileByUUID(File folder, UUID uuid) {
         String s = getPathByUUID(uuid, 4, 2);
@@ -83,6 +89,8 @@ public class FileUtils {
      * @param folder
      * @param uuid uuid
      * @param data
+     *
+     * @return
      */
     public static File saveByUUID(File folder, byte[] data, UUID uuid) {
         String s = getPathByUUID(uuid, 4, 2);
@@ -111,9 +119,8 @@ public class FileUtils {
      * @param data
      */
     public static void writeData(File f, boolean append, byte[] data) {
-        try {
-            f = getFile(f.getPath(),true);//创建文件
-            OutputStream os = new FileOutputStream(f, append);
+        f = getFile(f.getPath(), true);//创建文件
+        try (OutputStream os = new FileOutputStream(f, append)) {
             ByteArrayInputStream in = new ByteArrayInputStream(data);
             IOUtils.transform(in, os);
         } catch (IOException ex) {
@@ -139,11 +146,52 @@ public class FileUtils {
      * @return
      */
     public static String readContent(File f, Charset encoding) {
-        try {
-            InputStream is = new FileInputStream(f);
+        try(InputStream is = new FileInputStream(f);) {
             return IOUtils.readContent(is, encoding);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+    /**
+     * 读取文件所有文本行
+     *
+     * @param f
+     * @param encoding
+     *
+     * @return
+     */
+    public static ArrayList<String> readLines(File f, Charset encoding) {
+        ArrayList<String> lines = new ArrayList();
+        String s;
+        try (BufferedReader br = getReader(f, encoding)) {
+            while ((s = br.readLine()) != null) {
+                lines.add(s);
+            }
+        } catch (IOException ex) {
+            throw new CEException(ex);
+        }
+        return lines;
+    }
+
+    /**
+     * 将文本行写入文件
+     *
+     * @param f
+     * @param encoding
+     * @param append 是否追加
+     * @param lines
+     */
+    public static void writeLines(File f, Charset encoding, boolean append, Collection<String> lines) {
+        Iterator<String> it = lines.iterator();
+        f = getFile(f.getPath(), true);
+        try (BufferedWriter bw = getWriter(f, encoding, append)) {
+            while (it.hasNext()) {
+                bw.write(it.next());
+                bw.newLine();
+            }
+        } catch (IOException ex) {
+            throw new CEException(ex);
         }
     }
 
@@ -252,6 +300,70 @@ public class FileUtils {
     }
 
     /**
+     * 打开BufferedWriter,默认UTF-8编码,非追加
+     *
+     * @param f
+     *
+     * @return
+     *
+     * @throws FileNotFoundException
+     */
+    public static BufferedWriter getWriter(File f) throws FileNotFoundException {
+        return getWriter(f, Charset.forName("UTF-8"), false);
+    }
+
+    /**
+     * 打开BufferedWriter,默认UTF-8编码
+     *
+     * @param f
+     * @param append 是否追加
+     *
+     * @return
+     *
+     * @throws FileNotFoundException
+     */
+    public static BufferedWriter getWriter(File f, boolean append) throws FileNotFoundException {
+        return getWriter(f, Charset.forName("UTF-8"), append);
+    }
+
+    /**
+     * 打开BufferedWriter,追加模式
+     *
+     * @param f
+     * @param encoding
+     *
+     * @return
+     *
+     * @throws FileNotFoundException
+     */
+    public static BufferedWriter getWriter(File f, Charset encoding) throws FileNotFoundException {
+        return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f, false), encoding));
+    }
+
+    /**
+     * 打开BufferedWriter
+     *
+     * @param f
+     * @param encoding 编码
+     * @param append 追加
+     *
+     * @return
+     *
+     * @throws FileNotFoundException
+     */
+    public static BufferedWriter getWriter(File f, Charset encoding, boolean append) throws FileNotFoundException {
+        return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f, append), encoding));
+    }
+
+    public static BufferedReader getReader(File f) throws FileNotFoundException {
+        return getReader(f, Charset.forName("UTF-8"));
+    }
+
+    public static BufferedReader getReader(File f, Charset encoding) throws FileNotFoundException {
+        return new BufferedReader(new InputStreamReader(new FileInputStream(f), encoding));
+    }
+
+    /**
      * 一次性压缩多个文件，文件存放至一个文件夹中
      */
     //ZipMultiFile("f:/uu", "f:/zippath.zip");
@@ -265,7 +377,7 @@ public class FileUtils {
             File temp;
             String entryS;
             ZipEntry entry;
-            
+
             zipOut = new ZipOutputStream(new FileOutputStream(zipFile));
             zipOut.setLevel(level);
             filelist = FileList(file);
