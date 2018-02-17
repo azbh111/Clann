@@ -241,6 +241,7 @@ public abstract class CustomCommand implements CommandExecutor {
                 sub.method.invoke(this, sender, args);
             }
         } catch (Throwable e) {
+            e.printStackTrace();//增加控制台打印
             Throwable ce;
             String info = "指令执行过程中抛出";
             ce = e;
