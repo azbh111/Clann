@@ -44,6 +44,9 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger, Configab
         setPlugin();//自动设置plugin属性
     }
 
+    /**
+     * 如果子类有静态实例属性plugin,则将实例赋予之
+     */
     private void setPlugin() {
         Field plugin;
         try {
@@ -102,7 +105,7 @@ public abstract class BasePlugin extends JavaPlugin implements ILogger, Configab
     @Override
     public final void onEnable() {
         saveDefaultConfig();//保存配置文件
-        initPluginClasses();//记录本插件所有类类,且所有类的静态块会被jvm调用
+        initPluginClasses();//记录本插件所有类,且所有类的静态块会被jvm调用
         reloadConfig();
         initBeans();//注册Bean
         registerModules();// 自动实例化所有模块
