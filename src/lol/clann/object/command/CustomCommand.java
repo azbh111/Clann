@@ -14,19 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
- * 样例
- * 方法名为指令的第一个参数,/op example
- * @SubCommandAnnotation(
- * mustPlayer = true, //是否必须玩家才能执行,可省,默认false
- * needOp = false, //是否必须有OP权限(控制台也有)才能执行,可省,默认true
- * permission = "essentials.fly", //执行此指令所需权限,可省
- * args = "(player) [count]", //无参时 args可省略,圆括号表示参数,方括号表示可省参数
- * des = "导出当前世界[指定世界]所有TileEntity信息") //指令描述信息,不可省
- * 当有可省参数,导致指令描述困难时,des可以是字符串数组,但数量必须偶数,以指令+描述的形式成对存在,如:
- * des = {"玩家","指令描述1","玩家 数量","指令描述2"}
- * public void example(CommandSender sender, String[] args) {
- *  //args包含输入指令的第二个参数到结尾的所有参数
- * }
+ * 指令框架,依赖注解
  */
 public abstract class CustomCommand implements CommandExecutor {
 
@@ -39,6 +27,23 @@ public abstract class CustomCommand implements CommandExecutor {
         plugin.getCommand(cmd).setExecutor(this);
     }
 
+    /*
+     * 指令样例1:/cmd testCommand args
+     * @SubCommandAnnotation(needOp = true, permission = "", mustPlayer =
+     * false,args = "(player)", des = "查看玩家afk状态")
+     * public void testCommand1(CommandSender sender, String[] args) {
+     * code
+     * }
+     */
+ /*
+     * 指令样例2:/cmd testCommand2 args
+     *
+     * @SubCommandAnnotation(needOp = true, permission = "", mustPlayer = true,
+     * args = "(player)", des = "查看玩家afk状态")
+     * public void testCommand2(Player player, String[] args) {
+     * code
+     * }
+     */
     /**
      * 注册类
      *
