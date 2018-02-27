@@ -146,7 +146,7 @@ public class FileUtils {
      * @return
      */
     public static String readContent(File f, Charset encoding) {
-        try(InputStream is = new FileInputStream(f);) {
+        try (InputStream is = new FileInputStream(f);) {
             return IOUtils.readContent(is, encoding);
         } catch (IOException ex) {
             throw new RuntimeException(ex);
@@ -308,7 +308,7 @@ public class FileUtils {
      *
      * @throws FileNotFoundException
      */
-    public static BufferedWriter getWriter(File f) throws FileNotFoundException {
+    public static BufferedWriter getWriter(File f) {
         return getWriter(f, Charset.forName("UTF-8"), false);
     }
 
@@ -322,7 +322,7 @@ public class FileUtils {
      *
      * @throws FileNotFoundException
      */
-    public static BufferedWriter getWriter(File f, boolean append) throws FileNotFoundException {
+    public static BufferedWriter getWriter(File f, boolean append) {
         return getWriter(f, Charset.forName("UTF-8"), append);
     }
 
@@ -336,8 +336,12 @@ public class FileUtils {
      *
      * @throws FileNotFoundException
      */
-    public static BufferedWriter getWriter(File f, Charset encoding) throws FileNotFoundException {
-        return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f, false), encoding));
+    public static BufferedWriter getWriter(File f, Charset encoding) {
+        try {
+            return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f, false), encoding));
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     /**
@@ -351,8 +355,12 @@ public class FileUtils {
      *
      * @throws FileNotFoundException
      */
-    public static BufferedWriter getWriter(File f, Charset encoding, boolean append) throws FileNotFoundException {
-        return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f, append), encoding));
+    public static BufferedWriter getWriter(File f, Charset encoding, boolean append) {
+        try {
+            return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f, append), encoding));
+        } catch (FileNotFoundException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     public static BufferedReader getReader(File f) throws FileNotFoundException {
