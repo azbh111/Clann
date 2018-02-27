@@ -30,6 +30,17 @@ import javax.swing.filechooser.FileSystemView;
  */
 public class SystemApi {
 
+    private static int cpuThreads = Runtime.getRuntime().availableProcessors();
+
+    /**
+     * 返回CPU线程数
+     *
+     * @return
+     */
+    public static int getCPUThreads() {
+        return cpuThreads;
+    }
+
     public static Charset getSystemCharset() {
         String osName = System.getProperty("os.name");
         if (osName.toLowerCase().contains("win")) {
@@ -83,6 +94,7 @@ public class SystemApi {
      * 获取指定盘符的硬盘序列号
      *
      * @param root 盘符
+     *
      * @return
      */
     public static String getSerialNumber(String root) {
@@ -118,6 +130,7 @@ public class SystemApi {
      * 驱动器卷序列号
      *
      * @param root 驱动器盘符
+     *
      * @return
      */
     public static String getHdSerialInfo(String root) {
@@ -172,6 +185,10 @@ public class SystemApi {
 
     /**
      * 从剪切板获得图片。
+     *
+     * @return
+     *
+     * @throws java.lang.Exception
      */
     public static Image getImageFromClipboard() throws Exception {
         Clipboard sysc = Toolkit.getDefaultToolkit().getSystemClipboard();
