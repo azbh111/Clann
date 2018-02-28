@@ -16,6 +16,7 @@ import org.bukkit.craftbukkit.v1_7_R4.CraftWorld;
 import org.bukkit.craftbukkit.v1_7_R4.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 /**
@@ -23,6 +24,17 @@ import org.bukkit.entity.Player;
  * @author zyp
  */
 public class EntityUtils {
+
+    /**
+     * 设置实体的生命值
+     *
+     * @param le
+     * @param expression 表达式
+     */
+    public static void setHealth(LivingEntity le, double t) {
+        double max = le.getMaxHealth();
+        le.setHealth(t > max ? max : t);
+    }
 
     /**
      * 获取玩家准星所指的实体,若没有则返回null
