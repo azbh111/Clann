@@ -102,31 +102,19 @@ public class PlayerApi {
     }
 
     public static Boolean isOp(CommandSender sender) {
-        if (sender.isOp() && sender instanceof Player) {
-            return true;
-        }
-        return false;
+        return sender.isOp() && sender instanceof Player;
     }
 
     public static Boolean isCommonPlayer(CommandSender sender) {
-        if (sender instanceof Player && !sender.isOp()) {
-            return true;
-        }
-        return false;
+        return sender instanceof Player && !sender.isOp();
     }
 
     public static Boolean isConsole(CommandSender sender) {
-        if (!(sender instanceof Player)) {
-            return true;
-        }
-        return false;
+        return !(sender instanceof Player);
     }
 
     public static Boolean isPlayer(CommandSender sender) {
-        if (sender instanceof Player) {
-            return true;
-        }
-        return false;
+        return sender instanceof Player;
     }
 
 }

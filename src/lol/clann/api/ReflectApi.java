@@ -33,7 +33,7 @@ public class ReflectApi {
     public static RefClass WorldServer = getRefClass("{nms}.WorldServer, {nm}.world.WorldServer, {WorldServer}");
     public static RefClass MinecraftServer = getRefClass("{nms}.MinecraftServer, {nm}.server.MinecraftServer, {MinecraftServer}");
     public static RefClass CraftServer = getRefClass("{cb}.CraftServer, {CraftServer}");
-
+    
     public static RefClass JsonToNBT = getRefClass("{nms}.JsonToNBT, {nm}.nbt.JsonToNBT, {JsonToNBT}");
     public static RefClass NBTBase = getRefClass("{nms}.NBTBase, {nm}.nbt.NBTBase, {NBTBase}");
     public static RefClass NBTTagByte = getRefClass("{nms}.NBTTagByte, {nm}.nbt.NBTTagByte, {NBTTagByte}");
