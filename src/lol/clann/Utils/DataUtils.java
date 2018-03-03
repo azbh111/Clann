@@ -10,23 +10,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-import static lol.clann.api.DataApi.hexDigits;
-import static lol.clann.api.DataApi.transfer;
 
 /**
  * 提供对二进制数据的处理
@@ -244,6 +242,20 @@ public class DataUtils {
             return byteToHex(bytes);
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+    }
+    /**
+     * 从输入流传输数据到输出流
+     *
+     * @param in 输入流
+     * @param out 输出流
+     * @param size 缓冲区大小
+     */
+    public static void transfer(InputStream in, OutputStream out, int size) throws IOException {
+        byte[] bs = new byte[size];
+        int i = 0;
+        while ((i = in.read(bs)) != -1) {
+            out.write(bs, 0, i);
         }
     }
 }
