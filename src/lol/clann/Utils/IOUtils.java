@@ -6,7 +6,6 @@
 package lol.clann.Utils;
 
 import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,6 +44,8 @@ public class IOUtils {
         pOPStream.close();
     }
 
+    
+    
     /**
      * 将流中的内容全部读取出来,并使用指定编码转换为String
      *
@@ -100,5 +101,8 @@ public class IOUtils {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         transform(pIStream, baos);
         return baos.toByteArray();
+    }
+    public static void writeBytes(OutputStream out,byte[] data) throws IOException{
+        out.write(data);
     }
 }

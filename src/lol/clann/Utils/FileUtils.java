@@ -23,12 +23,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
-import lol.clann.api.FileApi;
 import lol.clann.object.command.CEException;
 
 /**
@@ -441,7 +438,7 @@ public class FileUtils {
             output.close();
             outFile.setLastModified(entry.getTime());
         } catch (IOException ex) {
-            Logger.getLogger(FileApi.class.getName()).log(Level.SEVERE, null, ex);
+           throw new RuntimeException(ex);
         }
     }
 
